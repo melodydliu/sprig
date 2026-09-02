@@ -1,56 +1,166 @@
-# Welcome to your Expo app 👋
+# Forage 🌿
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A personal foraging journal. Spot a plant on a roadside, capture it in a few
+seconds (photo + a couple of details + location), and find it again later by
+browsing a list or a map.
 
-## Get started
+Built with **Expo (managed) + expo-router + TypeScript**, **Supabase** (auth /
+Postgres / storage — added in a later milestone), **react-native-maps**, and a
+local-first data layer.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Status
 
-2. Start the app
+**Milestone 1 — scaffold, design system, stubbed auth, mock data layer.**
 
-   ```bash
-   npx expo start
-   ```
+The whole app runs against an in-memory mock (persisted to device storage) that
+implements the same `EntryRepository` / `PhotoRepository` / `AuthService`
+interfaces the real backend will use later. Camera, photo library, GPS and maps
+are real; only auth, cloud storage and sync are stubbed.
 
-In the output, you'll find options to open the app in a
+| Milestone | What |
+| --- | --- |
+| 1 ✅ | Project + design system + stubbed sign-in + mock data + seed entries |
+| 2 | Capture flow (camera / library / GPS) |
+| 3 | Journal list, Map, Entry detail, filters / search / sort, Settings — **pause for UI feedback** |
+| 4 | Real local DB (expo-sqlite) |
+| 5 | Supabase: SQL + RLS + storage policies, photo upload, sync queue |
+| 6 | Real auth (magic link, Apple, Google) |
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Run it on the iOS Simulator (primary dev loop)
 
-## Get a fresh project
+No Apple Developer account, no EAS, no cost. You need **Xcode** with the
+Command Line Tools and an iOS platform installed.
 
-When you're ready, run:
+### One-time setup
+
+1. Install **Xcode** from the Mac App Store.
+2. `xcode-select --install`
+3. Open Xcode once to accept the license and let it install components.
+4. Install an iOS Simulator runtime if you don't have one:
+   `xcodebuild -downloadPlatform iOS` (or Xcode ▸ Settings ▸ Components).
+5. CocoaPods (used by the native build): `brew install cocoapods`
+6. `npm install`
+
+### Every time
 
 ```bash
-npm run reset-project
+npm run ios          # builds the dev client locally and launches the Simulator
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The first build takes several minutes (it compiles the native project). After
+that, `npm run ios` is fast, and JS changes hot-reload via Fast Refresh — just
+edit and save.
 
-### Other setup steps
+Default simulator: **iPhone 17**. To pick another:
+`npx expo run:ios --device "iPhone 17 Pro"`.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### Make the Simulator useful for testing
 
-## Learn more
+```bash
+npm run seed-sim     # adds placeholder photos to the sim's photo library
+                     # and sets the simulated GPS to Huntington Beach, CA
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+- **Camera** doesn't exist in the Simulator — the Capture flow falls back to the
+  photo library automatically.
+- **Location**: change the live fix any time via
+  *Simulator ▸ Features ▸ Location ▸ Custom Location…* (Huntington Beach is
+  `33.6595, -117.9988`).
+- **Maps**: Apple Maps works in the Simulator with no API key.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Reset the sample data
 
-## Join the community
+```bash
+npm run reset-data   # uninstalls Forage from the sim; next `npm run ios` re-seeds
+```
 
-Join our community of developers creating universal apps.
+Or, in the app: **Settings ▸ Developer ▸ Reset to sample data**.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## Quick layout checks in the browser
+
+```bash
+npm run web          # opens in Chrome; resize to phone width
+```
+
+Web is for typography/layout iteration only. The map screen shows a
+"Map available on device" placeholder on web.
+
+---
+
+## Optional: reality check on a physical phone
+
+Camera and GPS behave differently on real hardware. For a quick check you can run
+the JS in **Expo Go** (free, from the App Store):
+
+```bash
+npm start            # then scan the QR code with Expo Go
+```
+
+Native modules that aren't in Expo Go won't work there — the Simulator dev build
+is the source of truth.
+
+---
+
+## Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `npm run ios` | Local dev build + launch in the Simulator |
+| `npm run web` | Web build for layout checks |
+| `npm start` | Dev server for an existing dev build / Expo Go |
+| `npm run seed-sim` | Seed the sim's photo library + GPS |
+| `npm run reset-data` | Wipe local data (uninstall from sim) |
+| `npm run gen-seed-images` | Regenerate the botanical placeholder photos |
+| `npm test` | Unit tests (filter/sort/geo logic) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | `expo lint` |
+
+---
+
+## Project layout
+
+```
+src/
+  app/                 expo-router routes (thin)
+    (auth)/sign-in     stubbed sign-in
+    (app)/             journal, capture, entry/[id], settings
+  theme/               design tokens + ThemeProvider (light/dark)
+  components/           shared UI (Text, Button, Field, Screen, Toast, …)
+  features/
+    auth/              AuthService consumer + auth store
+    entries/           entries store + cards / list / detail pieces
+    filters/           pure search / filter / sort  (unit-tested)
+    location/          useCurrentLocation (graceful degradation)
+  data/
+    repositories.ts    the interfaces the UI depends on
+    index.ts           wiring point (mock today, Supabase later)
+    mock/              in-memory + AsyncStorage + FileSystem + seed
+  lib/                 geo, date formatting, ids
+assets/seed/           bundled botanical placeholder photos
+scripts/               seed-image generator, simulator helpers
+```
+
+## The test login
+
+The sign-in screen is fully designed but not wired to a backend. Use:
+
+```
+test@forage.app  /  forage123
+```
+
+or tap any social button — all resolve to the same mock user. Auth lives behind
+`AuthService` so Milestone 6 swaps in Supabase by touching one file.
+
+---
+
+## Later milestones (not set up yet — will propose steps + costs first)
+
+EAS Build/Update, Apple Developer Program, TestFlight, Google Play, Android
+builds, Google Maps API key for Android, real Apple/Google sign-in, Supabase
+project + `.env` (see `.env.example`).
