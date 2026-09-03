@@ -359,7 +359,8 @@ export async function buildSeedEntries(now: number = Date.now()): Promise<Entry[
       createdAt: created,
       updatedAt: created,
       deletedAt: null,
-      syncStatus: 'synced',
+      // Sample data has never been backed up — the first sync pass pushes it.
+      syncStatus: 'pending',
     });
   }
   return entries;
