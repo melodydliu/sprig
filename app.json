@@ -46,7 +46,9 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#FAF6EE",
-          "dark": { "backgroundColor": "#181611" },
+          "dark": {
+            "backgroundColor": "#181611"
+          },
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 84
         }
@@ -68,7 +70,8 @@
         {
           "locationWhenInUsePermission": "Forage tags each find with where you saw it so you can come back later. Location is stored only on your device."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
