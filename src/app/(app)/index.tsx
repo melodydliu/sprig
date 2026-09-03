@@ -4,7 +4,7 @@ import { Link, useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef } from 'react';
 import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowUpDown, List, Map as MapIcon, Plus, Settings2, SlidersHorizontal } from 'lucide-react-native';
+import { ArrowUpDown, List, Map as MapIcon, Plus, Settings, SlidersHorizontal } from 'lucide-react-native';
 
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
@@ -59,7 +59,7 @@ export default function JournalScreen() {
           <Toggle viewMode={viewMode} onChange={setViewMode} />
           <Link href="/settings" asChild>
             <Pressable hitSlop={8} accessibilityLabel="Settings">
-              <Settings2 size={21} color={theme.colors.textSecondary} strokeWidth={2.2} />
+              <Settings size={21} color={theme.colors.textSecondary} strokeWidth={2.2} />
             </Pressable>
           </Link>
         </View>
