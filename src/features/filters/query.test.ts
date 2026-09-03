@@ -76,6 +76,20 @@ describe('matchesFilter', () => {
     expect(matchesFilter(e, filter({ colors: ['red', 'blue'] }))).toBe(false);
   });
 
+  it('filters by tag (any overlap)', () => {
+    const e = makeEntry({ tags: ['roadside', 'aromatic'] });
+    expect(matchesFilter(e, filter({ tags: ['aromatic'] }))).toBe(true);
+    expect(matchesFilter(e, filter({ tags: ['fence-line', 'roadside'] }))).toBe(true);
+    expect(matchesFilter(e, filter({ tags: ['fence-line'] }))).toBe(false);
+    expect(matchesFilter(makeEntry({ tags: [] }), filter({ tags: ['roadside'] }))).toBe(false);
+  });
+
+  it('combines category + tag as AND across facets', () => {
+    const e = makeEntry({ category: 'flower', tags: ['spring'] });
+    expect(matchesFilter(e, filter({ categories: ['flower'], tags: ['spring'] }))).toBe(true);
+    expect(matchesFilter(e, filter({ categories: ['flower'], tags: ['winter'] }))).toBe(false);
+  });
+
   it('filters favorites only', () => {
     expect(matchesFilter(makeEntry({ isFavorite: false }), filter({ favoritesOnly: true }))).toBe(
       false,

@@ -13,6 +13,7 @@ export type SortKey = 'newest' | 'oldest' | 'nearest' | 'name' | 'recently_updat
 export interface EntryFilter {
   categories: Category[];
   colors: ColorName[];
+  tags: string[];
   favoritesOnly: boolean;
   /** ISO date (inclusive lower bound) for `sightedAt`. */
   dateFrom: string | null;

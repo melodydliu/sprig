@@ -18,6 +18,7 @@ interface FilterState {
   setViewMode: (m: ViewMode) => void;
   toggleCategory: (c: Category) => void;
   toggleColor: (c: ColorName) => void;
+  toggleTag: (t: string) => void;
   toggleFavoritesOnly: () => void;
   setDateRange: (from: string | null, to: string | null) => void;
   setWithinMiles: (miles: number | null) => void;
@@ -52,6 +53,16 @@ export const useFilters = create<FilterState>((set) => ({
         colors: state.filter.colors.includes(c)
           ? state.filter.colors.filter((x) => x !== c)
           : [...state.filter.colors, c],
+      },
+    })),
+
+  toggleTag: (t) =>
+    set((state) => ({
+      filter: {
+        ...state.filter,
+        tags: state.filter.tags.includes(t)
+          ? state.filter.tags.filter((x) => x !== t)
+          : [...state.filter.tags, t],
       },
     })),
 

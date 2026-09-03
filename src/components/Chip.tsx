@@ -1,8 +1,17 @@
+import type { ComponentType, ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { Text } from '@/components/Text';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { LucideIcon } from 'lucide-react-native';
+
+interface TouchableLikeProps {
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+  accessibilityRole?: 'button';
+  accessibilityState?: { selected?: boolean };
+  children?: ReactNode;
+}
 
 interface ChipProps {
   label: string;
@@ -14,28 +23,39 @@ interface ChipProps {
   /** A small color swatch shown before the label (for the color picker). */
   swatch?: string;
   style?: StyleProp<ViewStyle>;
+  /**
+   * Touchable to render with. Inside a bottom sheet's scrollable, pass the
+   * sheet-aware `TouchableOpacity` from `@gorhom/bottom-sheet`, otherwise plain
+   * `Pressable` (default) swallows the tap.
+   */
+  Touchable?: ComponentType<TouchableLikeProps>;
 }
 
-export function Chip({ label, selected, onPress, icon: Icon, accent, swatch, style }: ChipProps) {
+export function Chip({
+  label,
+  selected,
+  onPress,
+  icon: Icon,
+  accent,
+  swatch,
+  style,
+  Touchable,
+}: ChipProps) {
   const theme = useTheme();
   const tint = accent ?? theme.colors.primary;
 
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.chip,
-        {
-          backgroundColor: selected ? tint : theme.colors.surface,
-          borderColor: selected ? tint : theme.colors.border,
-          borderRadius: theme.radius.pill,
-          opacity: pressed ? 0.85 : 1,
-        },
-        style,
-      ]}
-    >
+  const base: StyleProp<ViewStyle> = [
+    styles.chip,
+    {
+      backgroundColor: selected ? tint : theme.colors.surface,
+      borderColor: selected ? tint : theme.colors.border,
+      borderRadius: theme.radius.pill,
+    },
+    style,
+  ];
+
+  const content = (
+    <>
       {swatch ? (
         <View
           style={[
@@ -56,12 +76,33 @@ export function Chip({ label, selected, onPress, icon: Icon, accent, swatch, sty
           color={selected ? theme.colors.onPrimary : theme.colors.textSecondary}
         />
       ) : null}
-      <Text
-        variant="label"
-        style={{ color: selected ? theme.colors.onPrimary : theme.colors.text }}
-      >
+      <Text variant="label" style={{ color: selected ? theme.colors.onPrimary : theme.colors.text }}>
         {label}
       </Text>
+    </>
+  );
+
+  if (Touchable) {
+    return (
+      <Touchable
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityState={{ selected }}
+        style={base}
+      >
+        {content}
+      </Touchable>
+    );
+  }
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={({ pressed }) => [base, pressed && { opacity: 0.85 }]}
+    >
+      {content}
     </Pressable>
   );
 }
