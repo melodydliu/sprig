@@ -4,10 +4,6 @@ Sprig's cloud backend: Postgres (`entries` + `photos`), Storage (photo bytes),
 and Auth (Milestone 6). The on-device SQLite database stays the source of truth
 — this is backup + cross-device sync.
 
-Nothing in the app talks to Supabase yet. Milestone 5c (sync queue) and
-Milestone 6 (auth) are the first consumers. You can set this up now or when 5c
-lands.
-
 ## 1. Create the project
 
 1. <https://supabase.com> → **New project** (the free tier is enough).
@@ -44,6 +40,17 @@ Put both in **`.env.local`** at the repo root (git-ignored — a plain `.env` is
 *not*). See [`../.env.example`](../.env.example). Restart `npm start` after
 changing env vars.
 
+## 4. Enable anonymous sign-ins
+
+Sync needs a Supabase session for `auth.uid()`. Real auth (email / Apple /
+Google) is Milestone 6; until then the app uses an **anonymous** session.
+
+Dashboard ▸ **Authentication** ▸ **Sign In / Providers** ▸ scroll to
+**Anonymous sign-ins** ▸ toggle **on** ▸ Save.
+
+This creates a real (but throwaway) user per device. RLS still applies. M6
+upgrades that anon user into a real account without losing its data.
+
 The `anon` key is meant to ship in a client app: every table has RLS, so it can
 only ever read or write the signed-in user's own rows. Never commit the
 **service role** key.
@@ -56,10 +63,11 @@ only ever read or write the signed-in user's own rows. Never commit the
   server trigger that overwrites it; the app sets it on every local edit.
 - **Soft delete:** `entries.deleted_at` is set and the row is kept, so the
   tombstone syncs to other devices.
-- **Photo bytes are not in Postgres.** They go to Storage at
-  `entry-photos/${user_id}/${entry_id}/${photo_id}.jpg`; `photos.storage_path`
-  and `photos.remote_url` point at them. The device-local `local_uri` /
-  `thumbnail_uri` never leave the phone.
+- **Photo bytes are not in Postgres.** They go to the private Storage bucket at
+  `entry-photos/${user_id}/${entry_id}/${photo_id}.jpg`; `photos.storage_path` is
+  the object key and `photos.remote_url` is a long-lived signed URL the app mints
+  on upload / pull. The device-local `local_uri` / `thumbnail_uri` never leave
+  the phone.
 - `photos.user_id` is denormalised from the parent entry so per-user checks
   (and the Storage path prefix) stay single-column.
 - **Sync ordering:** upsert an entry row before its photo rows (`photos.entry_id`

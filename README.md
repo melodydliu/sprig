@@ -12,19 +12,14 @@ local-first data layer.
 
 ## Status
 
-**Milestone 5a — local SQLite is the on-device source of truth.**
+**Milestone 5c — background sync to Supabase.**
 
-Entries and photos now persist in a real on-device SQLite database (`sprig.db`),
-behind the same `EntryRepository` / `PhotoRepository` / `AuthService` interfaces
-the UI has always used — no screen changed. Auth, cloud storage and sync are
-still stubbed (mock auth; `sync()` just clears the local queue). Camera, photo
-library, GPS and maps are real. Photo *bytes* stay as files in the app's
-`photos/` directory; only the index of what belongs to which entry lives in the
-database. `npm run web` still runs on the in-memory mock (layout checks only).
-
-Milestone 5b adds the Supabase schema, RLS, and storage policies as files in
-[`supabase/`](./supabase/) plus a `src/lib/supabase.ts` client — **nothing
-consumes them yet**; the sync queue that wires them in is Milestone 5c.
+Local SQLite (`sprig.db`) is the source of truth; every write is queued and
+pushed in the background — photos to a private Storage bucket, rows to Postgres —
+and remote changes are pulled back with last-write-wins. The network is never on
+the UI's critical path. Until real auth (M6) the sync layer uses an **anonymous**
+Supabase session for identity. With no Supabase keys set, the app runs exactly as
+before, fully local. `npm run web` still runs on the in-memory mock.
 
 | Milestone | What |
 | --- | --- |
@@ -33,8 +28,8 @@ consumes them yet**; the sync queue that wires them in is Milestone 5c.
 | 3 ✅ | Journal list, Map, Entry detail, filters / search / sort, Settings |
 | 4 ✅ | (paused here for UI/UX feedback) |
 | 5a ✅ | Real local DB — `expo-sqlite`, clean-seeded on first run |
-| 5b ✅ | Supabase schema + RLS + storage policies (files only, no consumer yet) |
-| 5c | Photo upload + sync queue |
+| 5b ✅ | Supabase schema + RLS + storage policies |
+| 5c ✅ | Photo upload + background sync queue (anonymous session for now) |
 | 6 | Real auth (magic link, Apple, Google) |
 
 ---
@@ -171,11 +166,13 @@ or tap any social button — all resolve to the same mock user. Auth lives behin
 ## Cloud backend (Supabase)
 
 Optional and not required for local development — the app runs fully on the
-device SQLite database without it. When you're ready to add backup + sync,
+device SQLite database without it. To enable backup + sync,
 [`supabase/README.md`](./supabase/README.md) walks through creating a free
-project and applying `supabase/schema.sql` + `supabase/policies.sql`, then
-setting `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` in
-`.env.local` (see `.env.example`). The sync queue that uses it is Milestone 5c.
+project, applying `supabase/schema.sql` + `supabase/policies.sql`, enabling
+anonymous sign-ins, and setting `EXPO_PUBLIC_SUPABASE_URL` /
+`EXPO_PUBLIC_SUPABASE_ANON_KEY` in `.env.local` (see `.env.example`). Once those
+are set the app signs in anonymously and syncs in the background; the sync status
+shows on the Journal and in Settings.
 
 ---
 

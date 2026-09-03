@@ -53,8 +53,6 @@ export interface EntryRepository {
   addPhotos(id: string, photos: PhotoInput[]): Promise<Entry>;
   removePhoto(entryId: string, photoId: string): Promise<Entry>;
   reorderPhotos(entryId: string, photoIdsInOrder: string[]): Promise<Entry>;
-  /** No-op for the mock; triggers a sync pass for the real impl. */
-  sync(): Promise<void>;
   /** Dev helper — wipes local data and reloads the sample set. */
   resetToSampleData(): Promise<void>;
 }

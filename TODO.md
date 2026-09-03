@@ -72,6 +72,35 @@ Done — spec step 5b (this session):
 - `supabase/README.md` — create project, apply order, where to find URL + anon
   key. `.env.example` + `README.md` updated.
 
+Done — spec step 5c (this session):
+
+- **`src/features/sync/`** — the engine. `plan.ts` (pure: `planPush` oldest-first,
+  `planPhotoUploads`, `mergeRemote` LWW, `storagePath`), `remoteMappers.ts` (local
+  ↔ Postgres row shapes), `identity.ts` (`getSyncUserId` → cached anonymous
+  session), `syncStore.ts` (`useSync` zustand), `engine.ts`
+  (`createSyncEngine(deps)` — injectable deps, `runOnce` / `requestSync` (2s
+  debounce, coalesced) / `syncNow` / `refreshPending`), `local.ts` + `remote.ts`
+  (the concrete deps halves), `useSyncBootstrap.ts` (initial sync + AppState
+  foreground + `startAutoRefresh`), `components/SyncStatusBar.tsx`.
+- Push: photos → Storage (`${uid}/${entryId}/${photoId}.jpg`, private bucket,
+  signed URL back) **before** the entry upsert, then photo rows + prune removed,
+  then tombstone storage cleanup. Success → `synced`; failure → `error`, retried
+  next pass. Pull: `entries` + nested `photos` changed since `meta.last_pulled_at`,
+  merged LWW; pulled photos render from a signed URL.
+- Derive the pending set from `entries.sync_status != 'synced'` — **no
+  `sync_queue` table**, no new SQLite migration.
+- **Identity = anonymous Supabase session** (user's call; real auth is M6).
+  Needs "Anonymous sign-ins" enabled in the dashboard.
+- **No NetInfo** (user's call). Triggers: after each save (debounced), app
+  foreground, manual "Sync now" / pull-to-refresh.
+- Removed `sync()` from the `EntryRepository` interface + both impls; extracted
+  the shared read path to `src/data/sqlite/read.ts`.
+- Wired: `entriesStore` writes → `requestSync()`; `(app)/_layout` →
+  `useSyncBootstrap()`; Journal → `<SyncStatusBar/>` + pull-to-refresh; Settings
+  "Sync" section reads `useSync`, "Sync now" → `syncEngine.syncNow()`.
+- Tests: `plan.test.ts`, `remoteMappers.test.ts`, `engine.test.ts` (fake deps:
+  photo-before-row ordering, retry, LWW pull, push order, tombstone). 54 passing.
+
 ---
 
 ## Milestone 5 — Supabase (spec step 5, continued)
@@ -80,24 +109,7 @@ Done — spec step 5b (this session):
 
 ### 5b. Supabase SQL + policies + client — DONE (see above)
 
-### 5c. Photo upload + sync queue (spec "Sync behavior" section)
-
-- Local DB is the source of truth. Every write goes local first, then enqueued.
-- Sync queue: a `sync_queue` table (or derive from `entries.sync_status =
-  'pending'`). On a sync pass:
-  1. For each pending entry, upload any photos without a `remote_url` to Storage
-     (`${user_id}/${entry_id}/${photo_id}.jpg`), set `remote_url`.
-  2. Upsert the entry row to Postgres.
-  3. Mark `sync_status = 'synced'`; on failure mark `'error'` + keep for retry.
-- Triggers: on app foreground, on connectivity regained
-  (`@react-native-community/netinfo`), and after each save. Debounce.
-- Conflict resolution: last-write-wins by `updated_at`. Keep simple.
-- Pull: on sync, also fetch rows changed since last sync and merge (LWW).
-- Never block UI on network. The existing unobtrusive Settings "sync status" +
-  the small indicator idea from the spec — add a subtle top-of-Journal indicator.
-- Wire `Settings → Sync now` and the pull-to-refresh on Journal to the real pass.
-- **Add unit tests for the sync queue** (spec step 8): ordering, retry on error,
-  LWW conflict, photo-before-row ordering.
+### 5c. Photo upload + sync queue — DONE (see above)
 
 ---
 

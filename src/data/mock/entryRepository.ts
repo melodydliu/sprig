@@ -168,14 +168,6 @@ class MockEntryRepository implements EntryRepository {
     return clone(entry);
   }
 
-  async sync(): Promise<void> {
-    await this.ensureLoaded();
-    await delay(600);
-    // Mock: pretend everything reached the cloud.
-    for (const e of this.entries) e.syncStatus = 'synced';
-    await this.save(true);
-  }
-
   async resetToSampleData(): Promise<void> {
     clearAllPhotos();
     await clearMockStorage();

@@ -7,11 +7,11 @@ import { ChevronLeft } from 'lucide-react-native';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { useToast } from '@/components/Toast';
-import { entryRepository } from '@/data';
 import { useAuth } from '@/features/auth/authStore';
 import { exportAllData } from '@/features/data-export/exportData';
 import { useEntries } from '@/features/entries/entriesStore';
 import { useSettings, type Units } from '@/features/settings/settingsStore';
+import { syncEngine, useSync } from '@/features/sync';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function SettingsScreen() {
@@ -23,6 +23,7 @@ export default function SettingsScreen() {
   const signOut = useAuth((s) => s.signOut);
   const { all, resetToSampleData } = useEntries();
   const { units, setUnits, hydrate } = useSettings();
+  const sync = useSync();
 
   const [busy, setBusy] = useState<null | 'reset' | 'export' | 'sync'>(null);
 
@@ -31,15 +32,24 @@ export default function SettingsScreen() {
   }, [hydrate]);
 
   const entryCount = all.filter((e) => !e.deletedAt).length;
-  const pendingCount = all.filter((e) => e.syncStatus === 'pending' && !e.deletedAt).length;
+
+  const syncStatusLabel =
+    sync.status === 'disabled'
+      ? 'Off — no Supabase keys'
+      : sync.status === 'syncing'
+        ? 'Syncing…'
+        : sync.status === 'error'
+          ? (sync.error ?? 'Last sync had errors')
+          : sync.pending > 0
+            ? `${sync.pending} waiting to sync`
+            : 'All backed up';
 
   const doSync = async () => {
     setBusy('sync');
     try {
-      // Mock: entryRepository.sync() marks everything synced.
-      await entryRepository.sync();
+      await syncEngine.syncNow();
       await useEntries.getState().load({ force: true });
-      toast.show('Synced', 'success');
+      toast.show(useSync.getState().status === 'error' ? 'Sync incomplete' : 'Synced', 'success');
     } finally {
       setBusy(null);
     }
@@ -105,18 +115,17 @@ export default function SettingsScreen() {
       </Section>
 
       <Section title="Sync">
-        <Row
-          label="Status"
-          value={pendingCount > 0 ? `${pendingCount} waiting to sync` : 'All synced (local)'}
-        />
+        <Row label="Status" value={syncStatusLabel} />
         <Divider />
         <TapRow
-          label={busy === 'sync' ? 'Syncing…' : 'Sync now'}
+          label={busy === 'sync' || sync.status === 'syncing' ? 'Syncing…' : 'Sync now'}
           onPress={doSync}
-          disabled={busy != null}
+          disabled={busy != null || sync.status === 'disabled'}
         />
         <Text variant="caption" color="textMuted" style={styles.note}>
-          Cloud backup is stubbed in this build — “Sync now” just clears the local queue.
+          {sync.status === 'disabled'
+            ? 'Add EXPO_PUBLIC_SUPABASE_* keys to .env.local to back finds up to the cloud.'
+            : 'Finds sync to your Supabase project in the background. Your device stays the source of truth.'}
         </Text>
       </Section>
 

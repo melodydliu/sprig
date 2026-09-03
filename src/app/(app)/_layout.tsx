@@ -1,9 +1,11 @@
 import { Stack } from 'expo-router';
 
+import { useSyncBootstrap } from '@/features/sync/useSyncBootstrap';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function AppLayout() {
   const theme = useTheme();
+  useSyncBootstrap();
   return (
     <Stack
       screenOptions={{

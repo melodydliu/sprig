@@ -20,6 +20,8 @@ import { SortSheet } from '@/features/filters/SortSheet';
 import { useCurrentLocation } from '@/features/location/useCurrentLocation';
 import { JournalMap } from '@/features/map/JournalMap';
 import { useSettings } from '@/features/settings/settingsStore';
+import { syncEngine } from '@/features/sync';
+import { SyncStatusBar } from '@/features/sync/components/SyncStatusBar';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function JournalScreen() {
@@ -77,6 +79,8 @@ export default function JournalScreen() {
 
       <FilterChips />
 
+      <SyncStatusBar />
+
       {viewMode === 'map' ? (
         <JournalMap entries={visible} />
       ) : loaded && visible.length === 0 ? (
@@ -97,7 +101,10 @@ export default function JournalScreen() {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => load({ refreshing: true })}
+              onRefresh={() => {
+                void syncEngine.syncNow();
+                return load({ refreshing: true });
+              }}
               tintColor={theme.colors.textMuted}
             />
           }

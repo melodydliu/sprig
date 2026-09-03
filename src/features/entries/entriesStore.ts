@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { entryRepository } from '@/data';
+import { syncEngine } from '@/features/sync';
 import type { EntryDraft, Entry } from '@/types/entry';
 import type { PhotoInput } from '@/data/repositories';
 
@@ -56,12 +57,14 @@ export const useEntries = create<EntriesState>((set, get) => ({
   create: async (draft, photos) => {
     const entry = await entryRepository.create(draft, photos);
     set({ all: upsert(get().all, entry) });
+    syncEngine.requestSync();
     return entry;
   },
 
   update: async (id, patch) => {
     const entry = await entryRepository.update(id, patch);
     set({ all: upsert(get().all, entry) });
+    syncEngine.requestSync();
     return entry;
   },
 
@@ -73,6 +76,7 @@ export const useEntries = create<EntriesState>((set, get) => ({
     try {
       const entry = await entryRepository.setFavorite(id, !current.isFavorite);
       set({ all: upsert(get().all, entry) });
+      syncEngine.requestSync();
     } catch {
       set({ all: upsert(get().all, current) });
     }
@@ -81,17 +85,20 @@ export const useEntries = create<EntriesState>((set, get) => ({
   remove: async (id) => {
     await entryRepository.remove(id);
     set({ all: get().all.filter((e) => e.id !== id) });
+    syncEngine.requestSync();
   },
 
   addPhotos: async (id, photos) => {
     const entry = await entryRepository.addPhotos(id, photos);
     set({ all: upsert(get().all, entry) });
+    syncEngine.requestSync();
     return entry;
   },
 
   removePhoto: async (entryId, photoId) => {
     const entry = await entryRepository.removePhoto(entryId, photoId);
     set({ all: upsert(get().all, entry) });
+    syncEngine.requestSync();
     return entry;
   },
 

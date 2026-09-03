@@ -15,11 +15,10 @@ import {
   PHOTO_COLUMNS,
   photoRowValues,
   photoToRow,
-  rowToEntry,
-  type EntryRow,
   type PhotoRow,
 } from './mappers';
 import { sqlitePhotoRepository } from './photoRepository';
+import { loadEntries, loadEntry } from './read';
 
 const ENTRY_INSERT = buildInsert('entries', ENTRY_COLUMNS);
 const PHOTO_INSERT = buildInsert('photos', PHOTO_COLUMNS);
@@ -75,27 +74,9 @@ class SqliteEntryRepository implements EntryRepository {
     });
   }
 
-  private async attachPhotos(db: SQLiteDatabase, entryRows: EntryRow[]): Promise<Entry[]> {
-    if (entryRows.length === 0) return [];
-    const ids = entryRows.map((r) => r.id);
-    const marks = ids.map(() => '?').join(', ');
-    const photoRows = await db.getAllAsync<PhotoRow>(
-      `SELECT * FROM photos WHERE entry_id IN (${marks})`,
-      ids,
-    );
-    const byEntry = new Map<string, PhotoRow[]>();
-    for (const pr of photoRows) {
-      const list = byEntry.get(pr.entry_id);
-      if (list) list.push(pr);
-      else byEntry.set(pr.entry_id, [pr]);
-    }
-    return entryRows.map((er) => rowToEntry(er, byEntry.get(er.id) ?? []));
-  }
-
   private async requireEntry(db: SQLiteDatabase, id: string): Promise<Entry> {
-    const row = await db.getFirstAsync<EntryRow>('SELECT * FROM entries WHERE id = ?', id);
-    if (!row) throw new Error(`Entry ${id} not found`);
-    const [entry] = await this.attachPhotos(db, [row]);
+    const entry = await loadEntry(db, id);
+    if (!entry) throw new Error(`Entry ${id} not found`);
     return entry;
   }
 
@@ -125,20 +106,14 @@ class SqliteEntryRepository implements EntryRepository {
 
   async list(query?: EntryQuery): Promise<Entry[]> {
     const db = await this.ready();
-    const rows = await db.getAllAsync<EntryRow>('SELECT * FROM entries WHERE deleted_at IS NULL');
-    const entries = await this.attachPhotos(db, rows);
+    const entries = await loadEntries(db);
     return runQuery(entries, query);
   }
 
   async get(id: string): Promise<Entry | null> {
     const db = await this.ready();
-    const row = await db.getFirstAsync<EntryRow>(
-      'SELECT * FROM entries WHERE id = ? AND deleted_at IS NULL',
-      id,
-    );
-    if (!row) return null;
-    const [entry] = await this.attachPhotos(db, [row]);
-    return entry ?? null;
+    const entry = await loadEntry(db, id);
+    return entry && !entry.deletedAt ? entry : null;
   }
 
   async create(draft: EntryDraft, photoInputs: PhotoInput[]): Promise<Entry> {
@@ -292,15 +267,6 @@ class SqliteEntryRepository implements EntryRepository {
       );
     });
     return this.requireEntry(db, entryId);
-  }
-
-  /**
-   * Milestone 5c replaces this with a real upload + push pass. For now it keeps
-   * the mock's behaviour: pretend every pending row reached the cloud.
-   */
-  async sync(): Promise<void> {
-    const db = await this.ready();
-    await db.runAsync("UPDATE entries SET sync_status = 'synced' WHERE sync_status != 'synced'");
   }
 
   async resetToSampleData(): Promise<void> {
