@@ -1,5 +1,5 @@
 /**
- * Forage design tokens.
+ * Sprig design tokens.
  *
  * Warm neutrals (off-white, soft sand) with a deep botanical green primary and a
  * terracotta accent. Marigold is reserved for the "favorite" state. Category

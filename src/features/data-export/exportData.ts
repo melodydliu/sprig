@@ -11,7 +11,7 @@ import { entryRepository } from '@/data';
 export async function exportAllData(): Promise<{ ok: boolean; count: number }> {
   const entries = await entryRepository.list();
   const payload = {
-    app: 'Forage',
+    app: 'Sprig',
     version: 1,
     exportedAt: new Date().toISOString(),
     entryCount: entries.length,
@@ -20,7 +20,7 @@ export async function exportAllData(): Promise<{ ok: boolean; count: number }> {
 
   const dir = new Directory(Paths.document, 'exports');
   if (!dir.exists) dir.create({ intermediates: true });
-  const file = new File(dir, `forage-export-${Date.now()}.json`);
+  const file = new File(dir, `sprig-export-${Date.now()}.json`);
   if (file.exists) file.delete();
   file.write(JSON.stringify(payload, null, 2));
 
@@ -28,7 +28,7 @@ export async function exportAllData(): Promise<{ ok: boolean; count: number }> {
     await Share.share(
       Platform.OS === 'ios'
         ? { url: file.uri }
-        : { message: `Forage export (${entries.length} finds)`, url: file.uri },
+        : { message: `Sprig export (${entries.length} finds)`, url: file.uri },
     );
     return { ok: true, count: entries.length };
   } catch {

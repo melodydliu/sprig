@@ -1,4 +1,4 @@
-# Forage — project notes for Claude
+# Sprig — project notes for Claude
 
 Personal foraging journal. Expo (managed) + expo-router + TypeScript. iOS Simulator
 is the source of truth during the mock-data phase; keep everything web-compatible for

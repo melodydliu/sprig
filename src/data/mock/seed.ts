@@ -4,7 +4,7 @@ import type { Category, ColorName, Entry, LocationSource, Photo } from '@/types/
 import { copyBundledPhoto } from './photoRepository';
 import { SEED_IMAGE_H, SEED_IMAGE_W, seedImages, type SeedImageKey } from './seedImages';
 
-export const MOCK_USER_ID = 'mock-user-forage';
+export const MOCK_USER_ID = 'mock-user-sprig';
 
 const DAY = 86_400_000;
 

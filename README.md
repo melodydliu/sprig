@@ -1,4 +1,4 @@
-# Forage 🌿
+# Sprig 🌿
 
 A personal foraging journal. Spot a plant on a roadside, capture it in a few
 seconds (photo + a couple of details + location), and find it again later by
@@ -75,7 +75,7 @@ npm run seed-sim     # adds placeholder photos to the sim's photo library
 ### Reset the sample data
 
 ```bash
-npm run reset-data   # uninstalls Forage from the sim; next `npm run ios` re-seeds
+npm run reset-data   # uninstalls Sprig from the sim; next `npm run ios` re-seeds
 ```
 
 Or, in the app: **Settings ▸ Developer ▸ Reset to sample data**.
@@ -151,7 +151,7 @@ scripts/               seed-image generator, simulator helpers
 The sign-in screen is fully designed but not wired to a backend. Use:
 
 ```
-test@forage.app  /  forage123
+test@sprig.app  /  sprig123
 ```
 
 or tap any social button — all resolve to the same mock user. Auth lives behind

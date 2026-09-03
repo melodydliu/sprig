@@ -4,7 +4,7 @@ import Svg, { Path } from 'react-native-svg';
 import { Text } from '@/components/Text';
 import { useTheme } from '@/theme/ThemeProvider';
 
-/** A small sprig glyph + the "Forage" wordmark. */
+/** A small sprig glyph + the "Sprig" wordmark. */
 export function Wordmark({ size = 34 }: { size?: number }) {
   const theme = useTheme();
   return (
@@ -19,7 +19,7 @@ export function Wordmark({ size = 34 }: { size?: number }) {
           letterSpacing: 0.2,
         }}
       >
-        Forage
+        Sprig
       </Text>
     </View>
   );

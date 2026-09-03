@@ -113,7 +113,7 @@ export default function CaptureCameraScreen() {
         body={
           askedBefore
             ? 'Enable camera access in Settings to photograph a find, or add one from your library.'
-            : 'Forage uses the camera so you can photograph a plant the moment you spot it.'
+            : 'Sprig uses the camera so you can photograph a plant the moment you spot it.'
         }
         primaryLabel={askedBefore ? 'Open Settings' : 'Enable camera'}
         onPrimary={askedBefore ? () => Linking.openSettings() : () => void requestPermission()}

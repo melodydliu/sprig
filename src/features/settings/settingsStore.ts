@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 export type Units = 'mi' | 'km';
 
-const KEY = 'forage.settings.v1';
+const KEY = 'sprig.settings.v1';
 
 interface SettingsState {
   units: Units;

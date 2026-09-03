@@ -1,4 +1,4 @@
-/** Core domain model for Forage. Kept backend-agnostic on purpose. */
+/** Core domain model for Sprig. Kept backend-agnostic on purpose. */
 
 export const CATEGORIES = [
   'flower',

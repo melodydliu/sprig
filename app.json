@@ -1,26 +1,26 @@
 {
   "expo": {
-    "name": "Forage",
-    "slug": "forage",
+    "name": "Sprig",
+    "slug": "sprig",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "forage",
+    "scheme": "sprig",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.forage.app",
+      "bundleIdentifier": "com.sprig.app",
       "infoPlist": {
-        "NSCameraUsageDescription": "Forage uses the camera so you can photograph a plant the moment you spot it.",
-        "NSPhotoLibraryUsageDescription": "Forage lets you add photos from your library to a find.",
-        "NSPhotoLibraryAddUsageDescription": "Forage can save a find's photo back to your library when you export it.",
-        "NSLocationWhenInUseUsageDescription": "Forage tags each find with where you saw it so you can come back later. Location is stored only on your device.",
+        "NSCameraUsageDescription": "Sprig uses the camera so you can photograph a plant the moment you spot it.",
+        "NSPhotoLibraryUsageDescription": "Sprig lets you add photos from your library to a find.",
+        "NSPhotoLibraryAddUsageDescription": "Sprig can save a find's photo back to your library when you export it.",
+        "NSLocationWhenInUseUsageDescription": "Sprig tags each find with where you saw it so you can come back later. Location is stored only on your device.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.forage.app",
+      "package": "com.sprig.app",
       "adaptiveIcon": {
         "backgroundColor": "#FAF6EE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -56,19 +56,19 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Forage uses the camera so you can photograph a plant the moment you spot it."
+          "cameraPermission": "Sprig uses the camera so you can photograph a plant the moment you spot it."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Forage lets you add photos from your library to a find."
+          "photosPermission": "Sprig lets you add photos from your library to a find."
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Forage tags each find with where you saw it so you can come back later. Location is stored only on your device."
+          "locationWhenInUsePermission": "Sprig tags each find with where you saw it so you can come back later. Location is stored only on your device."
         }
       ],
       "@react-native-community/datetimepicker"

@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { Entry } from '@/types/entry';
 
-const ENTRIES_KEY = 'forage.mock.entries.v1';
-const SEEDED_KEY = 'forage.mock.seeded.v1';
+const ENTRIES_KEY = 'sprig.mock.entries.v1';
+const SEEDED_KEY = 'sprig.mock.seeded.v1';
 
 let writeTimer: ReturnType<typeof setTimeout> | null = null;
 let pending: Entry[] | null = null;
@@ -32,7 +32,7 @@ async function flush(): Promise<void> {
   try {
     await AsyncStorage.setItem(ENTRIES_KEY, JSON.stringify(snapshot));
   } catch (err) {
-    console.warn('[forage] failed to persist entries', err);
+    console.warn('[sprig] failed to persist entries', err);
   }
 }
 
@@ -43,7 +43,7 @@ export async function loadEntries(): Promise<Entry[] | null> {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? (parsed as Entry[]) : null;
   } catch (err) {
-    console.warn('[forage] failed to load entries', err);
+    console.warn('[sprig] failed to load entries', err);
     return null;
   }
 }

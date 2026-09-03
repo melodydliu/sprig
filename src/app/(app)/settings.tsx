@@ -167,7 +167,7 @@ export default function SettingsScreen() {
       </Section>
 
       <Section title="About">
-        <Row label="App" value="Forage" />
+        <Row label="App" value="Sprig" />
         <Divider />
         <Row label="Version" value={`${Constants.expoConfig?.version ?? '1.0.0'} · MVP`} />
       </Section>

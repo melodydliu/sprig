@@ -1,5 +1,5 @@
 /**
- * Prepares the booted iOS Simulator for testing Forage:
+ * Prepares the booted iOS Simulator for testing Sprig:
  *   - adds the botanical placeholder images to the simulator's photo library
  *     (so the "add from library" path has something to pick), and
  *   - sets a simulated GPS location to Huntington Beach, CA.

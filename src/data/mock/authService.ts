@@ -5,11 +5,11 @@ import type { AuthUser } from '@/types/entry';
 
 import { MOCK_USER_ID } from './seed';
 
-const SESSION_KEY = 'forage.mock.session.v1';
+const SESSION_KEY = 'sprig.mock.session.v1';
 
 /** The one hardcoded credential that works in the mock. */
-export const TEST_EMAIL = 'test@forage.app';
-export const TEST_PASSWORD = 'forage123';
+export const TEST_EMAIL = 'test@sprig.app';
+export const TEST_PASSWORD = 'sprig123';
 
 function makeUser(email: string): AuthUser {
   return {
@@ -57,8 +57,8 @@ class MockAuthService implements AuthService {
   async getCurrentUser(): Promise<AuthUser | null> {
     await this.ensureLoaded();
     // Dev convenience: skip the login wall while iterating on the rest of the UI.
-    // Set EXPO_PUBLIC_FORAGE_DEV_AUTOLOGIN=1 in .env.local (never committed).
-    if (!this.user && process.env.EXPO_PUBLIC_FORAGE_DEV_AUTOLOGIN === '1') {
+    // Set EXPO_PUBLIC_SPRIG_DEV_AUTOLOGIN=1 in .env.local (never committed).
+    if (!this.user && process.env.EXPO_PUBLIC_SPRIG_DEV_AUTOLOGIN === '1') {
       this.user = makeUser(TEST_EMAIL);
     }
     return this.user;
