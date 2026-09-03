@@ -15,7 +15,7 @@ interface Props {
   label?: string;
 }
 
-export function DateField({ value, onChange, label = 'Date sighted' }: Props) {
+export function DateField({ value, onChange, label = 'Date captured' }: Props) {
   const theme = useTheme();
   const [showPicker, setShowPicker] = useState(false);
   const date = new Date(value);

@@ -14,6 +14,7 @@ import { useEntries } from '@/features/entries/entriesStore';
 import { CATEGORY_ICONS } from '@/features/entries/components/CategoryChip';
 import { useFilters } from '@/features/filters/filterStore';
 import { countActiveFilters } from '@/features/filters/query';
+import { TagFilterField } from '@/features/filters/TagFilterField';
 import { useTheme } from '@/theme/ThemeProvider';
 import { CATEGORIES, CATEGORY_LABELS, COLOR_NAMES, type ColorName } from '@/types/entry';
 
@@ -139,17 +140,7 @@ export const FilterSheet = forwardRef<BottomSheetModal>(function FilterSheet(_pr
 
         {availableTags.length > 0 ? (
           <Section title="Tags">
-            <View style={styles.wrap}>
-              {availableTags.map((t) => (
-                <Chip
-                  key={t}
-                  Touchable={TouchableOpacity}
-                  label={`#${t}`}
-                  selected={filter.tags.includes(t)}
-                  onPress={() => toggleTag(t)}
-                />
-              ))}
-            </View>
+            <TagFilterField allTags={availableTags} selected={filter.tags} onToggle={toggleTag} />
           </Section>
         ) : null}
 
@@ -165,7 +156,7 @@ export const FilterSheet = forwardRef<BottomSheetModal>(function FilterSheet(_pr
           </View>
         </Section>
 
-        <Section title="When">
+        <Section title="Date captured">
           <View style={styles.wrap}>
             {DATE_PRESETS.map((p) => (
               <Chip

@@ -125,7 +125,7 @@ export default function EntryDetailScreen() {
           </View>
 
           <Text variant="caption" color="textMuted">
-            Sighted {fullDate(entry.sightedAt)}
+            Captured {fullDate(entry.sightedAt)}
           </Text>
 
           {entry.notes ? (
