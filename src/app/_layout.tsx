@@ -20,6 +20,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ToastProvider } from '@/components/Toast';
 import { useAuth } from '@/features/auth/authStore';
+import { useSettings } from '@/features/settings/settingsStore';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 
 SplashScreen.preventAutoHideAsync();
@@ -37,10 +38,12 @@ export default function RootLayout() {
 
   const status = useAuth((s) => s.status);
   const bootstrap = useAuth((s) => s.bootstrap);
+  const hydrateSettings = useSettings((s) => s.hydrate);
 
   useEffect(() => {
     void bootstrap();
-  }, [bootstrap]);
+    void hydrateSettings();
+  }, [bootstrap, hydrateSettings]);
 
   const ready = (fontsLoaded || !!fontError) && status !== 'loading';
 

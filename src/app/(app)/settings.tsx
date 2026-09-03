@@ -1,24 +1,59 @@
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
 
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { useToast } from '@/components/Toast';
+import { entryRepository } from '@/data';
 import { useAuth } from '@/features/auth/authStore';
+import { exportAllData } from '@/features/data-export/exportData';
 import { useEntries } from '@/features/entries/entriesStore';
+import { useSettings, type Units } from '@/features/settings/settingsStore';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function SettingsScreen() {
   const theme = useTheme();
   const router = useRouter();
   const toast = useToast();
+
   const user = useAuth((s) => s.user);
   const signOut = useAuth((s) => s.signOut);
-  const resetToSampleData = useEntries((s) => s.resetToSampleData);
-  const [resetting, setResetting] = useState(false);
+  const { all, resetToSampleData } = useEntries();
+  const { units, setUnits, hydrate } = useSettings();
+
+  const [busy, setBusy] = useState<null | 'reset' | 'export' | 'sync'>(null);
+
+  useEffect(() => {
+    void hydrate();
+  }, [hydrate]);
+
+  const entryCount = all.filter((e) => !e.deletedAt).length;
+  const pendingCount = all.filter((e) => e.syncStatus === 'pending' && !e.deletedAt).length;
+
+  const doSync = async () => {
+    setBusy('sync');
+    try {
+      // Mock: entryRepository.sync() marks everything synced.
+      await entryRepository.sync();
+      await useEntries.getState().load({ force: true });
+      toast.show('Synced', 'success');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const doExport = async () => {
+    setBusy('export');
+    try {
+      const res = await exportAllData();
+      if (res.ok) toast.show(`Exported ${res.count} finds`, 'success');
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const confirmReset = () => {
     Alert.alert(
@@ -30,16 +65,24 @@ export default function SettingsScreen() {
           text: 'Reset',
           style: 'destructive',
           onPress: async () => {
-            setResetting(true);
+            setBusy('reset');
             try {
               await resetToSampleData();
               toast.show('Sample data restored', 'success');
             } finally {
-              setResetting(false);
+              setBusy(null);
             }
           },
         },
       ],
+    );
+  };
+
+  const confirmDeleteAccount = () => {
+    Alert.alert(
+      'Delete account',
+      'Account deletion needs the cloud backend, which is not wired up in this build. For now, "Sign out" and "Reset to sample data" cover local testing.',
+      [{ text: 'OK' }],
     );
   };
 
@@ -55,36 +98,81 @@ export default function SettingsScreen() {
 
       <Section title="Account">
         <Row label="Signed in as" value={user?.email ?? '—'} />
+        <Divider />
         <Row label="Name" value={user?.profile.displayName ?? '—'} />
-        <Pressable onPress={signOut} style={styles.row}>
-          <Text variant="bodyMedium" color="danger">
-            Sign out
-          </Text>
-        </Pressable>
+        <Divider />
+        <TapRow label="Sign out" tone="danger" onPress={signOut} />
       </Section>
 
       <Section title="Sync">
-        <Row label="Status" value="Local only (MVP)" />
+        <Row
+          label="Status"
+          value={pendingCount > 0 ? `${pendingCount} waiting to sync` : 'All synced (local)'}
+        />
+        <Divider />
+        <TapRow
+          label={busy === 'sync' ? 'Syncing…' : 'Sync now'}
+          onPress={doSync}
+          disabled={busy != null}
+        />
         <Text variant="caption" color="textMuted" style={styles.note}>
-          Cloud backup and multi-device sync arrive in a later milestone.
+          Cloud backup is stubbed in this build — “Sync now” just clears the local queue.
         </Text>
       </Section>
 
+      <Section title="Units">
+        <View style={styles.segmentRow}>
+          {(['mi', 'km'] as Units[]).map((u) => {
+            const active = units === u;
+            return (
+              <Pressable
+                key={u}
+                onPress={() => setUnits(u)}
+                style={[
+                  styles.segment,
+                  {
+                    backgroundColor: active ? theme.colors.primary : theme.colors.surface,
+                    borderColor: active ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  variant="label"
+                  style={{ color: active ? theme.colors.onPrimary : theme.colors.textSecondary }}
+                >
+                  {u === 'mi' ? 'Miles' : 'Kilometres'}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Section>
+
+      <Section title="Data">
+        <TapRow
+          label={busy === 'export' ? 'Preparing…' : `Export all data (${entryCount} finds)`}
+          onPress={doExport}
+          disabled={busy != null}
+        />
+        <Divider />
+        <TapRow label="Delete account" tone="danger" onPress={confirmDeleteAccount} />
+      </Section>
+
       <Section title="Developer">
-        <Pressable onPress={confirmReset} disabled={resetting} style={styles.row}>
-          <Text variant="bodyMedium" color={resetting ? 'textMuted' : 'primary'}>
-            {resetting ? 'Resetting…' : 'Reset to sample data'}
-          </Text>
-        </Pressable>
+        <TapRow
+          label={busy === 'reset' ? 'Resetting…' : 'Reset to sample data'}
+          onPress={confirmReset}
+          disabled={busy != null}
+        />
       </Section>
 
       <Section title="About">
         <Row label="App" value="Forage" />
-        <Row
-          label="Version"
-          value={`${Constants.expoConfig?.version ?? '1.0.0'} · MVP`}
-        />
+        <Divider />
+        <Row label="Version" value={`${Constants.expoConfig?.version ?? '1.0.0'} · MVP`} />
       </Section>
+
+      <View style={{ height: 40 }} />
     </Screen>
   );
 }
@@ -99,7 +187,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <View
         style={[
           styles.card,
-          { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, borderRadius: theme.radius.lg },
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.border,
+            borderRadius: theme.radius.lg,
+          },
         ]}
       >
         {children}
@@ -114,9 +206,40 @@ function Row({ label, value }: { label: string; value: string }) {
       <Text variant="body" color="textSecondary">
         {label}
       </Text>
-      <Text variant="bodyMedium">{value}</Text>
+      <Text variant="bodyMedium" numberOfLines={1} style={styles.rowValue}>
+        {value}
+      </Text>
     </View>
   );
+}
+
+function TapRow({
+  label,
+  onPress,
+  tone = 'default',
+  disabled,
+}: {
+  label: string;
+  onPress: () => void;
+  tone?: 'default' | 'danger';
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable onPress={onPress} disabled={disabled} style={styles.row}>
+      <Text
+        variant="bodyMedium"
+        color={tone === 'danger' ? 'danger' : 'primary'}
+        style={{ opacity: disabled ? 0.5 : 1 }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function Divider() {
+  const theme = useTheme();
+  return <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />;
 }
 
 const styles = StyleSheet.create({
@@ -137,6 +260,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 14,
+    gap: 12,
   },
+  rowValue: { flexShrink: 1, textAlign: 'right' },
+  divider: { height: StyleSheet.hairlineWidth, marginLeft: 16 },
   note: { paddingHorizontal: 4, marginTop: 8 },
+  segmentRow: { flexDirection: 'row', gap: 8 },
+  segment: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+  },
 });

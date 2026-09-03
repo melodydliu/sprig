@@ -7,24 +7,23 @@ import { ChevronLeft, Crosshair, Search } from 'lucide-react-native';
 import { Button } from '@/components/Button';
 import { PickerMap, type PickerMapHandle } from '@/components/map/PickerMap';
 import { Text } from '@/components/Text';
-import { useCaptureDraft } from '@/features/capture/captureDraftStore';
 import { forwardGeocode, reverseGeocode } from '@/features/location/geocode';
+import { useLocationDraft } from '@/features/location/locationDraftStore';
 import { useCurrentLocation } from '@/features/location/useCurrentLocation';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { GeoPoint } from '@/types/entry';
 
 const HB_FALLBACK: GeoPoint = { latitude: 33.6595, longitude: -117.9988 };
 
-export default function CaptureLocationScreen() {
+/** Shared location picker. Reads the seed from `useLocationDraft`, writes `committed`. */
+export default function LocationPickerScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const draft = useCaptureDraft();
+  const { seedPoint, commit } = useLocationDraft();
   const mapRef = useRef<PickerMapHandle>(null);
   const { request: requestLocation } = useCurrentLocation(false);
 
-  const [point, setPoint] = useState<GeoPoint>(
-    draft.location ?? draft.gpsLocation ?? draft.exifLocation ?? HB_FALLBACK,
-  );
+  const [point, setPoint] = useState<GeoPoint>(seedPoint ?? HB_FALLBACK);
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -54,7 +53,7 @@ export default function CaptureLocationScreen() {
 
   const confirm = async () => {
     const label = await reverseGeocode(point);
-    draft.setLocation(point, 'manual', label);
+    commit(point, label);
     router.back();
   };
 
@@ -115,7 +114,6 @@ export default function CaptureLocationScreen() {
   );
 }
 
-// Small inline input to avoid pulling the labeled Field styling into the search bar.
 function TextInputLite(props: ComponentProps<typeof TextInput>) {
   const theme = useTheme();
   return (

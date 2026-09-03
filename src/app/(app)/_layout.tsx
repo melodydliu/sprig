@@ -17,6 +17,8 @@ export default function AppLayout() {
         options={{ presentation: 'fullScreenModal', animation: 'fade' }}
       />
       <Stack.Screen name="entry/[id]" />
+      <Stack.Screen name="entry/[id]/edit" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="location" options={{ presentation: 'fullScreenModal' }} />
       <Stack.Screen name="settings" options={{ presentation: 'card' }} />
     </Stack>
   );

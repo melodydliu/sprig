@@ -16,6 +16,7 @@ interface CaptureDraftState extends EntryDraft {
   addPhotos: (photos: PhotoInput[]) => void;
   removePhotoAt: (index: number) => void;
   setField: <K extends keyof EntryDraft>(key: K, value: EntryDraft[K]) => void;
+  patch: (partial: Partial<EntryDraft>) => void;
   toggleColor: (color: ColorName) => void;
   setCategory: (category: Category) => void;
   setLocation: (
@@ -56,6 +57,8 @@ export const useCaptureDraft = create<CaptureDraftState>((set, get) => ({
   removePhotoAt: (index) => set({ photos: get().photos.filter((_, i) => i !== index) }),
 
   setField: (key, value) => set({ [key]: value } as Partial<CaptureDraftState>),
+
+  patch: (partial) => set(partial as Partial<CaptureDraftState>),
 
   toggleColor: (color) => {
     const colors = get().colors;
