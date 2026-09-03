@@ -70,7 +70,7 @@ export default function JournalScreen() {
         <IconBtn
           icon={SlidersHorizontal}
           badge={activeFilters}
-          onPress={() => sortSheet.current?.present()}
+          onPress={() => filterSheet.current?.present()}
         />
         <IconBtn icon={ArrowUpDown} onPress={() => sortSheet.current?.present()} />
       </View>
