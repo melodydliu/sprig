@@ -38,33 +38,30 @@ Done — spec steps 2–4 (Milestones 1–4 in commit history):
 
 **Paused here** for UI/UX feedback before backend work (spec step 4).
 
+Done — spec step 5a (this session):
+
+- **Local SQLite is the on-device source of truth.** `expo-sqlite` (`sprig.db`),
+  raw-SQL wrapper (no ORM). New impls in `src/data/sqlite/` (`db.ts` +
+  `PRAGMA user_version` migration runner, `schema.ts`, pure `mappers.ts`,
+  `entryRepository.ts`, `photoRepository.ts`). Wired in `src/data/index.ts`;
+  `src/data/index.web.ts` keeps web on the mock.
+- Schema: `entries` (all `Entry` columns; `colors`/`tags` as JSON text,
+  `location` split into `location_lat`/`location_lng`, `sync_status` +
+  `updated_at` kept), `photos` child table (FK + `ON DELETE CASCADE`), `meta`
+  (`seeded` flag). No `profiles` table yet — profile still comes from
+  `mockAuthService` until M6.
+- **Clean seed on first run** (user's call — no AsyncStorage import path).
+  `resetToSampleData()` rebuilds the seed into SQLite.
+- Image pipeline moved to shared `src/lib/images.ts`; seed moved to
+  backend-neutral `src/data/seed.ts`. Mock files kept as thin re-exports.
+- `entryRepository.sync()` still just marks rows `synced` (real pass is 5c).
+- Tests: `src/data/sqlite/mappers.test.ts` (11 cases). 36 passing total.
+
 ---
 
-## Milestone 5 — real local DB, then Supabase (spec step 5)
+## Milestone 5 — Supabase (spec step 5, continued)
 
-### 5a. Local SQLite as source of truth
-
-- Add `expo-sqlite` (async API — `import { openDatabaseAsync }` / new API).
-  Consider `drizzle-orm` + `drizzle-orm/expo-sqlite` only if it stays light;
-  raw SQL wrapper is fine and preferred for "no over-engineering".
-- New impls: `src/data/sqlite/entryRepository.ts`, `photoRepository.ts` that
-  satisfy the same interfaces. Wire them in `src/data/index.ts` (one file change).
-- Schema mirrors the data model in `src/types/entry.ts`:
-  - `entries` table: all `Entry` columns; `colors` / `tags` / `photos` handled as
-    a `photos` child table + JSON columns for `colors`/`tags` (or join tables —
-    JSON is simpler and fine for a single-user local DB).
-  - `photos` table: `id, entry_id, local_uri, remote_url, thumbnail_uri, width,
-    height, taken_at, sort_order`.
-  - `profiles` table (or keep in AsyncStorage until auth milestone).
-  - Keep `sync_status` + `updated_at` on `entries` for the sync queue.
-- Migration: on first run, if the AsyncStorage mock data exists, import it into
-  SQLite once (nice-to-have; a clean seed is acceptable — confirm with user).
-- Keep `resetToSampleData()` working (rebuild seed into SQLite).
-- Photo files stay in the FileSystem `photos/` dir exactly as now; only the DB
-  changes.
-- Keep the image pipeline (resize 1600px long edge + thumbnail) from
-  `src/data/mock/photoRepository.ts` — move it to a shared `src/lib/images.ts` so
-  both local + upload paths use it.
+### 5a. Local SQLite as source of truth — DONE (see above)
 
 ### 5b. Supabase — give the user SQL + policies + `.env.example`
 

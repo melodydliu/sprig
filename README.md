@@ -12,20 +12,25 @@ local-first data layer.
 
 ## Status
 
-**Milestone 1 — scaffold, design system, stubbed auth, mock data layer.**
+**Milestone 5a — local SQLite is the on-device source of truth.**
 
-The whole app runs against an in-memory mock (persisted to device storage) that
-implements the same `EntryRepository` / `PhotoRepository` / `AuthService`
-interfaces the real backend will use later. Camera, photo library, GPS and maps
-are real; only auth, cloud storage and sync are stubbed.
+Entries and photos now persist in a real on-device SQLite database (`sprig.db`),
+behind the same `EntryRepository` / `PhotoRepository` / `AuthService` interfaces
+the UI has always used — no screen changed. Auth, cloud storage and sync are
+still stubbed (mock auth; `sync()` just clears the local queue). Camera, photo
+library, GPS and maps are real. Photo *bytes* stay as files in the app's
+`photos/` directory; only the index of what belongs to which entry lives in the
+database. `npm run web` still runs on the in-memory mock (layout checks only).
 
 | Milestone | What |
 | --- | --- |
 | 1 ✅ | Project + design system + stubbed sign-in + mock data + seed entries |
-| 2 | Capture flow (camera / library / GPS) |
-| 3 | Journal list, Map, Entry detail, filters / search / sort, Settings — **pause for UI feedback** |
-| 4 | Real local DB (expo-sqlite) |
-| 5 | Supabase: SQL + RLS + storage policies, photo upload, sync queue |
+| 2 ✅ | Capture flow (camera / library / GPS) |
+| 3 ✅ | Journal list, Map, Entry detail, filters / search / sort, Settings |
+| 4 ✅ | (paused here for UI/UX feedback) |
+| 5a ✅ | Real local DB — `expo-sqlite`, clean-seeded on first run |
+| 5b | Supabase: SQL + RLS + storage policies |
+| 5c | Photo upload + sync queue |
 | 6 | Real auth (magic link, Apple, Google) |
 
 ---
