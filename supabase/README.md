@@ -17,10 +17,18 @@ lands.
 
 Dashboard ▸ **SQL Editor** ▸ *New query*, then paste and **Run**, in order:
 
-1. [`schema.sql`](./schema.sql) — tables, indexes, and the new-user → profile trigger
-2. [`policies.sql`](./policies.sql) — Row-Level Security + the private `entry-photos` Storage bucket
+1. [`schema.sql`](./schema.sql) — tables, indexes, the new-user → profile
+   trigger, and `enable row level security` on all three tables
+2. [`policies.sql`](./policies.sql) — the own-rows-only policies + the private
+   `entry-photos` Storage bucket
 
 Both files are idempotent, so it's safe to re-run them after edits.
+
+**About the pre-run warning:** the SQL editor flags both files for "destructive
+operations" — that's the guarded `create or replace trigger` / `drop policy if
+exists` lines, which only ever touch Sprig's own objects and recreate them
+immediately. `schema.sql` no longer trips the "tables without RLS" warning (it
+enables RLS itself). Both are expected; click through and run.
 
 ## 3. Point the app at it
 

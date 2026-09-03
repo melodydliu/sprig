@@ -5,6 +5,11 @@
 --
 -- The on-device SQLite database stays the source of truth; Postgres is backup
 -- + cross-device sync (Milestone 5c). Auth arrives in Milestone 6.
+--
+-- The dashboard may warn about "destructive operations" (the guarded
+-- `create or replace trigger` on auth.users — it replaces only Sprig's own
+-- trigger). RLS is enabled on all three tables at the end of this file, so the
+-- tables are never reachable without a policy; policies.sql adds those next.
 -- ---------------------------------------------------------------------------
 
 -- ===========================================================================
@@ -36,8 +41,7 @@ begin
 end;
 $$;
 
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
+create or replace trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
@@ -98,3 +102,13 @@ create table if not exists public.photos (
 
 create index if not exists photos_entry_id_idx on public.photos (entry_id);
 create index if not exists photos_user_id_idx  on public.photos (user_id);
+
+-- ===========================================================================
+-- Enable Row-Level Security immediately.
+-- ---------------------------------------------------------------------------
+-- With RLS on and no policies yet, every table is deny-all — safe. policies.sql
+-- adds the own-rows-only policies (and the Storage bucket) next.
+-- ===========================================================================
+alter table public.profiles enable row level security;
+alter table public.entries  enable row level security;
+alter table public.photos   enable row level security;

@@ -3,8 +3,14 @@
 -- Apply AFTER schema.sql. Idempotent: every policy is dropped-if-exists first,
 -- so this file is safe to re-run after edits.
 --
+-- The dashboard will warn about "destructive operations" — that's the
+-- `drop policy if exists` guards (they only drop Sprig's own policies, each
+-- recreated on the very next line). Expected; run it.
+--
 -- Rule for every table: a user can only see and change their own rows
 -- (auth.uid() = user_id). The `anon` key is therefore safe to ship in the app.
+-- schema.sql already enabled RLS; the `alter table … enable` lines below are
+-- repeated only so this file makes sense on its own.
 -- ---------------------------------------------------------------------------
 
 -- ===========================================================================
