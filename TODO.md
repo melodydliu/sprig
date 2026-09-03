@@ -57,26 +57,28 @@ Done — spec step 5a (this session):
 - `entryRepository.sync()` still just marks rows `synced` (real pass is 5c).
 - Tests: `src/data/sqlite/mappers.test.ts` (11 cases). 36 passing total.
 
+Done — spec step 5b (this session):
+
+- `@supabase/supabase-js` + `react-native-url-polyfill` added (both JS-only, no
+  native rebuild). `src/lib/supabase.ts` — nullable client from the env vars +
+  `isSupabaseConfigured` guard. **No consumer yet** (5c / M6).
+- `supabase/schema.sql` — `profiles` / `entries` / `photos`, client-minted
+  `text` ids, `text[]` for colors/tags, `location` split lat/lng, soft delete,
+  new-user→profile trigger. **No server `updated_at` trigger** — client owns it
+  for LWW.
+- `supabase/policies.sql` — RLS own-rows-only on all three + private
+  `entry-photos` bucket with `${uid}/…` prefix storage policies. Idempotent
+  (drop-if-exists before each).
+- `supabase/README.md` — create project, apply order, where to find URL + anon
+  key. `.env.example` + `README.md` updated.
+
 ---
 
 ## Milestone 5 — Supabase (spec step 5, continued)
 
 ### 5a. Local SQLite as source of truth — DONE (see above)
 
-### 5b. Supabase — give the user SQL + policies + `.env.example`
-
-- Add `@supabase/supabase-js` + `react-native-url-polyfill/auto`.
-- `src/lib/supabase.ts` — client from `EXPO_PUBLIC_SUPABASE_URL` /
-  `EXPO_PUBLIC_SUPABASE_ANON_KEY` (already stubbed in `.env.example`).
-- **Deliver to the user** (they run these in the Supabase dashboard):
-  - `supabase/schema.sql` — `profiles`, `entries`, `photos` tables. `entries`
-    and `photos` keyed by `user_id = auth.uid()`. Soft delete via `deleted_at`.
-  - **RLS policies**: enable RLS on all three; policies so each user can only
-    `select/insert/update/delete` their own rows (`auth.uid() = user_id`).
-  - **Storage**: a private bucket `entry-photos`; storage policies so a user can
-    only read/write objects under a `${auth.uid()}/…` prefix.
-  - `supabase/README.md` — how to apply, how to get the URL + anon key.
-- Update `.env.example` comments; document in `README.md`.
+### 5b. Supabase SQL + policies + client — DONE (see above)
 
 ### 5c. Photo upload + sync queue (spec "Sync behavior" section)
 
