@@ -167,9 +167,9 @@ export const fontFamily = {
   sansBold: 'Nunito_700Bold',
   sansHeavy: 'Nunito_800ExtraBold',
   /** Journal-like serif, used for entry names and big headings. */
-  serif: 'Fraunces_500Medium',
-  serifBold: 'Fraunces_600SemiBold',
-  serifItalic: 'Fraunces_400Regular_Italic',
+  serif: 'Newsreader_500Medium',
+  serifBold: 'Newsreader_600SemiBold',
+  serifItalic: 'Newsreader_400Regular_Italic',
 } as const;
 
 export const typography = {
