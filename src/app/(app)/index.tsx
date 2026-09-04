@@ -94,6 +94,12 @@ export default function JournalScreen() {
         <EmptyState hasEntries={totalVisible > 0} />
       ) : (
         <FlashList
+          // Force a clean remount on sort change: FlashList's cell recycler
+          // can lose track of items across a full reorder of the data (as
+          // opposed to appends/removals) — most visible on a small list
+          // being reversed or reshuffled, which is exactly what switching
+          // away from the default "newest" sort does.
+          key={sort}
           data={visible}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <EntryCard entry={item} origin={origin} unit={units} />}
