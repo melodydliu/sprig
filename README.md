@@ -12,14 +12,17 @@ local-first data layer.
 
 ## Status
 
-**Milestone 5c — background sync to Supabase.**
+**Milestone 6 — real accounts; heading to TestFlight.**
 
-Local SQLite (`sprig.db`) is the source of truth; every write is queued and
-pushed in the background — photos to a private Storage bucket, rows to Postgres —
-and remote changes are pulled back with last-write-wins. The network is never on
-the UI's critical path. Until real auth (M6) the sync layer uses an **anonymous**
-Supabase session for identity. With no Supabase keys set, the app runs exactly as
-before, fully local. `npm run web` still runs on the in-memory mock.
+The app is a local-first foraging journal: SQLite (`sprig.db`) is the source of
+truth, and every write syncs in the background to a private Supabase project
+(rows to Postgres, photos to a private Storage bucket) with last-write-wins.
+Sign-in is **email + password** (Supabase Auth) behind a hard login wall; a new
+account starts with an empty journal, and signing in on another device restores
+it from the cloud. `npm run web` runs on the in-memory mock.
+
+Remaining before a build: pre-flight cleanup (privacy policy, `eas.json`) then
+EAS Build → TestFlight. See `TODO.md`.
 
 | Milestone | What |
 | --- | --- |
@@ -27,10 +30,11 @@ before, fully local. `npm run web` still runs on the in-memory mock.
 | 2 ✅ | Capture flow (camera / library / GPS) |
 | 3 ✅ | Journal list, Map, Entry detail, filters / search / sort, Settings |
 | 4 ✅ | (paused here for UI/UX feedback) |
-| 5a ✅ | Real local DB — `expo-sqlite`, clean-seeded on first run |
+| 5a ✅ | Real local DB — `expo-sqlite` |
 | 5b ✅ | Supabase schema + RLS + storage policies |
-| 5c ✅ | Photo upload + background sync queue (anonymous session for now) |
-| 6 | Real auth (magic link, Apple, Google) |
+| 5c ✅ | Photo upload + background sync queue |
+| 6 ✅ | Real auth — email + password, per-account local cache |
+| 7 | Pre-flight cleanup → EAS Build → TestFlight |
 
 ---
 
@@ -150,33 +154,31 @@ assets/seed/           bundled botanical placeholder photos
 scripts/               seed-image generator, simulator helpers
 ```
 
-## The test login
+## Signing in
 
-The sign-in screen is fully designed but not wired to a backend. Use:
-
-```
-test@sprig.app  /  sprig123
-```
-
-or tap any social button — all resolve to the same mock user. Auth lives behind
-`AuthService` so Milestone 6 swaps in Supabase by touching one file.
+Sign-in is real (Supabase email + password) behind a hard login wall, so the app
+needs a configured Supabase project to run past the sign-in screen — set
+`EXPO_PUBLIC_SUPABASE_*` in `.env.local` (see below), then create an account in
+the app. Auth lives behind the `AuthService` interface (`src/data/repositories.ts`),
+implemented by `src/data/supabase/authService.ts`; `npm run web` uses a mock that
+accepts any credentials for layout checks.
 
 ---
 
 ## Cloud backend (Supabase)
 
-Optional and not required for local development — the app runs fully on the
-device SQLite database without it. To enable backup + sync,
+Required for the app to run (auth + sync share the project). To set it up,
 [`supabase/README.md`](./supabase/README.md) walks through creating a free
-project, applying `supabase/schema.sql` + `supabase/policies.sql`, enabling
-anonymous sign-ins, and setting `EXPO_PUBLIC_SUPABASE_URL` /
-`EXPO_PUBLIC_SUPABASE_ANON_KEY` in `.env.local` (see `.env.example`). Once those
-are set the app signs in anonymously and syncs in the background; the sync status
-shows on the Journal and in Settings.
+project, applying `supabase/schema.sql` + `supabase/policies.sql`, turning off
+"Confirm email", adding the `sprig://reset-password` redirect URL, and setting
+`EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`
+(see `.env.example`). Once those are set, create an account in the app; finds
+sync in the background and the status shows on the Journal and in Settings.
 
 ---
 
 ## Later milestones (not set up yet — will propose steps + costs first)
 
-EAS Build/Update, Apple Developer Program, TestFlight, Google Play, Android
-builds, Google Maps API key for Android, real Apple/Google sign-in.
+EAS Build/Update, Google Play, Android builds, Google Maps API key for Android,
+Sign in with Apple / Google, custom email (SMTP) for confirmation + reset.
+See `TODO.md` for the TestFlight path.

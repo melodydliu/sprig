@@ -82,6 +82,10 @@ class MockAuthService implements AuthService {
     /* no-op on web */
   }
 
+  async deleteAccount(): Promise<void> {
+    await this.setSession(null);
+  }
+
   onAuthStateChange(cb: (user: AuthUser | null) => void): () => void {
     this.listeners.add(cb);
     return () => this.listeners.delete(cb);

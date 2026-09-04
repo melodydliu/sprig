@@ -97,6 +97,35 @@ class SupabaseAuthService implements AuthService {
     if (error) throw new Error(friendly(error.message));
   }
 
+  /**
+   * Removes the user's data everywhere the client can reach: Storage objects,
+   * then the `photos` / `entries` / `profiles` rows, then signs out (which wipes
+   * the local cache). The `auth.users` record itself needs a service-role Edge
+   * Function to delete — a pre-public-App-Store task; until then the login can
+   * be reused to start fresh.
+   */
+  async deleteAccount(): Promise<void> {
+    const c = client();
+    const { data } = await c.auth.getSession();
+    const uid = data.session?.user?.id;
+    if (uid) {
+      const { data: photos } = await c
+        .from('photos')
+        .select('storage_path')
+        .eq('user_id', uid);
+      const paths = (photos ?? [])
+        .map((p: { storage_path: string | null }) => p.storage_path)
+        .filter((p: string | null): p is string => !!p);
+      if (paths.length > 0) {
+        await c.storage.from('entry-photos').remove(paths);
+      }
+      await c.from('photos').delete().eq('user_id', uid);
+      await c.from('entries').delete().eq('user_id', uid);
+      await c.from('profiles').delete().eq('id', uid);
+    }
+    await c.auth.signOut();
+  }
+
   onAuthStateChange(cb: (user: AuthUser | null) => void): () => void {
     const { data } = client().auth.onAuthStateChange((_event, session) => {
       if (session?.user) {

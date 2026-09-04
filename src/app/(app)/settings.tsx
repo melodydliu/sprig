@@ -21,11 +21,12 @@ export default function SettingsScreen() {
 
   const user = useAuth((s) => s.user);
   const signOut = useAuth((s) => s.signOut);
+  const deleteAccount = useAuth((s) => s.deleteAccount);
   const { all, resetToSampleData } = useEntries();
   const { units, setUnits, hydrate } = useSettings();
   const sync = useSync();
 
-  const [busy, setBusy] = useState<null | 'reset' | 'export' | 'sync'>(null);
+  const [busy, setBusy] = useState<null | 'reset' | 'export' | 'sync' | 'delete'>(null);
 
   useEffect(() => {
     void hydrate();
@@ -90,9 +91,25 @@ export default function SettingsScreen() {
 
   const confirmDeleteAccount = () => {
     Alert.alert(
-      'Delete account',
-      'Account deletion needs the cloud backend, which is not wired up in this build. For now, "Sign out" and "Reset to sample data" cover local testing.',
-      [{ text: 'OK' }],
+      'Delete account?',
+      'This permanently deletes every find, photo, and note in your Sprig account — on this device and in the cloud. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete everything',
+          style: 'destructive',
+          onPress: async () => {
+            setBusy('delete');
+            try {
+              const ok = await deleteAccount();
+              if (ok) toast.show('Account deleted', 'success');
+              else Alert.alert('Could not delete account', 'Check your connection and try again.');
+            } finally {
+              setBusy(null);
+            }
+          },
+        },
+      ],
     );
   };
 
@@ -164,16 +181,23 @@ export default function SettingsScreen() {
           disabled={busy != null}
         />
         <Divider />
-        <TapRow label="Delete account" tone="danger" onPress={confirmDeleteAccount} />
-      </Section>
-
-      <Section title="Developer">
         <TapRow
-          label={busy === 'reset' ? 'Resetting…' : 'Reset to sample data'}
-          onPress={confirmReset}
+          label={busy === 'delete' ? 'Deleting…' : 'Delete account'}
+          tone="danger"
+          onPress={confirmDeleteAccount}
           disabled={busy != null}
         />
       </Section>
+
+      {__DEV__ ? (
+        <Section title="Developer">
+          <TapRow
+            label={busy === 'reset' ? 'Resetting…' : 'Reset to sample data'}
+            onPress={confirmReset}
+            disabled={busy != null}
+          />
+        </Section>
+      ) : null}
 
       <Section title="About">
         <Row label="App" value="Sprig" />

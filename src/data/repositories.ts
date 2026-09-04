@@ -87,6 +87,8 @@ export interface AuthService {
   sendPasswordReset(email: string): Promise<void>;
   /** Completes a reset once the deep link has opened the app. */
   updatePassword(newPassword: string): Promise<void>;
+  /** Deletes the signed-in user's cloud data (entries, photos, profile) and signs out. */
+  deleteAccount(): Promise<void>;
   /** Fires whenever the session changes; returns an unsubscribe fn. */
   onAuthStateChange(cb: (user: AuthUser | null) => void): () => void;
 }

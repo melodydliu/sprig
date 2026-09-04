@@ -11,11 +11,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sprig.app",
+      "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "Sprig uses the camera so you can photograph a plant the moment you spot it.",
         "NSPhotoLibraryUsageDescription": "Sprig lets you add photos from your library to a find.",
         "NSPhotoLibraryAddUsageDescription": "Sprig can save a find's photo back to your library when you export it.",
-        "NSLocationWhenInUseUsageDescription": "Sprig tags each find with where you saw it so you can come back later. Location is stored only on your device.",
+        "NSLocationWhenInUseUsageDescription": "Sprig tags each find with where you saw it so you can come back later. Location is saved to your private journal and its cloud backup.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },

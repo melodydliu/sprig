@@ -19,6 +19,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<boolean>;
   updatePassword: (password: string) => Promise<boolean>;
+  deleteAccount: () => Promise<boolean>;
   clearError: () => void;
 }
 
@@ -108,6 +109,12 @@ export const useAuth = create<AuthState>((set) => ({
   sendPasswordReset: (email) => attempt(set, () => authService.sendPasswordReset(email)),
 
   updatePassword: (password) => attempt(set, () => authService.updatePassword(password)),
+
+  deleteAccount: () =>
+    attempt(set, async () => {
+      await authService.deleteAccount();
+      await onUser(null);
+    }),
 
   clearError: () => set({ error: null }),
 }));

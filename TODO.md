@@ -140,27 +140,56 @@ Done this session:
   the demo set. Removed `EXPO_PUBLIC_SPRIG_DEV_AUTOLOGIN`.
 - Tests: `authErrors.test.ts`, `account.test.ts` (+ existing). 59 passing.
 
-**User did:** Apple Developer Program enrolled. Supabase email provider is on.
-
-**User still needs (before this build is fully usable):**
-- Supabase ▸ Authentication ▸ Providers ▸ Email ▸ **turn OFF "Confirm email"**
-  (built-in mailer is rate-limited; custom SMTP + confirmation is a pre-public
-  item — see Phase 2).
-- Supabase ▸ Authentication ▸ URL Configuration ▸ add redirect
-  `sprig://reset-password`.
+**User did:** Apple Developer Program enrolled. Supabase: email provider on,
+"Confirm email" turned OFF (`mailer_autoconfirm: true`), `sprig://reset-password`
+added to redirect URLs. Verified end to end on the simulator (create account →
+empty journal → add find → syncs under real uid → sign out wipes local → sign in
+restores from cloud).
 
 Deferred: phone/SMS auth (paid SMS provider), Sign in with Apple / Google
-(post-launch), account deletion real flow (Phase 2).
+(post-launch).
 
 ---
 
-## Milestone 7 — docs & "run on my phone" (spec step 7)
+## Milestone 7 — to TestFlight
 
-- `README.md` is mostly there; add the real Supabase config steps, the
-  Google Maps API key step for Android, and Apple/Google sign-in setup once M6
-  is scoped.
-- Confirm the "how to run on my phone" section (Expo Go for a camera/GPS reality
-  check; dev build via `npm run ios` as source of truth).
+### Phase 2 — pre-flight cleanup
+
+Done this session:
+
+- **Delete account** (`settings.tsx` + `authService.deleteAccount`): real
+  destructive flow — removes Storage objects then `photos` / `entries` /
+  `profiles` rows for the uid, then signs out (wipes local). Two-step confirm.
+  NOTE: the `auth.users` row itself still needs a service-role Edge Function to
+  delete — required before the **public** App Store, fine for TestFlight (the
+  login can be reused to start fresh).
+- **Developer section** in Settings gated behind `__DEV__` — no "Reset to sample
+  data" in a release build.
+- `docs/privacy.md` + `docs/README.md` (how to publish via GitHub Pages).
+  **User must:** replace `CONTACT_EMAIL_PLACEHOLDER`, publish it, keep the URL
+  for App Store Connect.
+- `app.json`: `ios.buildNumber` "1"; location usage string updated (data also
+  goes to the cloud backup, not "device only").
+- `README.md` — status + sign-in/Supabase sections rewritten for real auth.
+- Removed the stale `test@sprig.app` login docs.
+
+Still open (not blocking TestFlight):
+- Custom SMTP (Resend / AWS SES free tier) so email confirmation + password
+  reset are reliable for friends — needed before wider sharing.
+- The 6 UI/UX polish questions (below) — deferred until after real use.
+
+### Phase 3 — EAS Build + TestFlight (next session)
+
+- `npm i -g eas-cli`; **user runs** `eas login` (free Expo account).
+- `eas init` → writes `extra.eas.projectId` + `owner` to `app.json`.
+- `eas.json`: `development` / `preview` / `production` profiles; `production`
+  sets `autoIncrement: true` + the `EXPO_PUBLIC_SUPABASE_*` env vars (publishable
+  keys, safe to bake in).
+- **User does:** App Store Connect → create the app record (bundle
+  `com.sprig.app`, name "Sprig"), accept agreements, TestFlight internal group.
+- `eas build -p ios --profile production` → `eas submit -p ios` → TestFlight in
+  ~30–60 min. Install via the TestFlight app.
+- For friends: external group + beta privacy questionnaire + ~1 day Apple review.
 
 ---
 
