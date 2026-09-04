@@ -6,11 +6,11 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { CATEGORIES, CATEGORY_LABELS, type Category } from '@/types/entry';
 
 interface Props {
-  value: Category;
-  onChange: (category: Category) => void;
+  value: Category[];
+  onToggle: (category: Category) => void;
 }
 
-export function CategoryPicker({ value, onChange }: Props) {
+export function CategoryPicker({ value, onToggle }: Props) {
   const theme = useTheme();
   return (
     <View style={styles.wrap}>
@@ -20,8 +20,8 @@ export function CategoryPicker({ value, onChange }: Props) {
           label={CATEGORY_LABELS[cat]}
           icon={CATEGORY_ICONS[cat]}
           accent={theme.categoryColor(cat).color}
-          selected={value === cat}
-          onPress={() => onChange(cat)}
+          selected={value.includes(cat)}
+          onPress={() => onToggle(cat)}
         />
       ))}
     </View>

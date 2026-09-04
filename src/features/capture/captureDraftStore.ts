@@ -18,7 +18,7 @@ interface CaptureDraftState extends EntryDraft {
   setField: <K extends keyof EntryDraft>(key: K, value: EntryDraft[K]) => void;
   patch: (partial: Partial<EntryDraft>) => void;
   toggleColor: (color: ColorName) => void;
-  setCategory: (category: Category) => void;
+  toggleCategory: (category: Category) => void;
   setLocation: (
     point: GeoPoint | null,
     source: LocationSource | null,
@@ -32,7 +32,7 @@ interface CaptureDraftState extends EntryDraft {
 function emptyDraft(): EntryDraft {
   return {
     name: null,
-    category: 'flower',
+    categories: ['flower'],
     colors: [],
     notes: '',
     location: null,
@@ -69,7 +69,15 @@ export const useCaptureDraft = create<CaptureDraftState>((set, get) => ({
     });
   },
 
-  setCategory: (category) => set({ category }),
+  toggleCategory: (category) => {
+    const categories = get().categories;
+    const has = categories.includes(category);
+    // Keep at least one category selected.
+    if (has && categories.length === 1) return;
+    set({
+      categories: has ? categories.filter((c) => c !== category) : [...categories, category],
+    });
+  },
 
   setLocation: (point, source, label) =>
     set({
@@ -85,7 +93,7 @@ export const useCaptureDraft = create<CaptureDraftState>((set, get) => ({
     const s = get();
     return {
       name: s.name,
-      category: s.category,
+      categories: s.categories,
       colors: s.colors,
       notes: s.notes,
       location: s.location,

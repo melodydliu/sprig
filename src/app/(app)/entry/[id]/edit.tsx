@@ -33,7 +33,7 @@ export default function EditEntryScreen() {
     entry
       ? {
           name: entry.name,
-          category: entry.category,
+          categories: entry.categories,
           colors: entry.colors,
           notes: entry.notes,
           tags: entry.tags,
@@ -114,7 +114,7 @@ export default function EditEntryScreen() {
     try {
       const draftPatch: Partial<EntryDraft> = {
         name: values.name,
-        category: values.category,
+        categories: values.categories,
         colors: values.colors,
         notes: values.notes,
         tags: values.tags,

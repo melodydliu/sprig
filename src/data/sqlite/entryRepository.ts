@@ -114,7 +114,7 @@ class SqliteEntryRepository implements EntryRepository {
       id,
       userId: MOCK_USER_ID,
       name: draft.name?.trim() ? draft.name.trim() : null,
-      category: draft.category,
+      categories: draft.categories,
       colors: draft.colors,
       notes: draft.notes,
       photos,
@@ -143,7 +143,7 @@ class SqliteEntryRepository implements EntryRepository {
     };
 
     if (patch.name !== undefined) set('name', patch.name?.trim() ? patch.name.trim() : null);
-    if (patch.category !== undefined) set('category', patch.category);
+    if (patch.categories !== undefined) set('categories', JSON.stringify(patch.categories));
     if (patch.colors !== undefined) set('colors', JSON.stringify(patch.colors));
     if (patch.notes !== undefined) set('notes', patch.notes);
     if (patch.location !== undefined) {

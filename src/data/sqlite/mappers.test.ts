@@ -14,7 +14,7 @@ const baseEntryRow: EntryRow = {
   id: 'en_1',
   user_id: 'mock-user-sprig',
   name: 'Wild fennel',
-  category: 'foliage',
+  categories: '["foliage"]',
   colors: '["green","yellow"]',
   notes: 'Along the bike path.',
   location_lat: 33.693,
@@ -74,6 +74,7 @@ describe('rowToEntry', () => {
     const entry = rowToEntry(baseEntryRow, photos);
 
     expect(entry.id).toBe('en_1');
+    expect(entry.categories).toEqual(['foliage']);
     expect(entry.colors).toEqual(['green', 'yellow']);
     expect(entry.tags).toEqual(['roadside', 'summer']);
     expect(entry.isFavorite).toBe(true);
@@ -90,8 +91,9 @@ describe('rowToEntry', () => {
     expect(rowToEntry({ ...baseEntryRow, location_lng: null }, []).location).toBeNull();
   });
 
-  it('tolerates garbage colors/tags columns', () => {
-    const entry = rowToEntry({ ...baseEntryRow, colors: 'oops', tags: '' }, []);
+  it('tolerates garbage colors/tags/categories columns', () => {
+    const entry = rowToEntry({ ...baseEntryRow, categories: 'oops', colors: 'oops', tags: '' }, []);
+    expect(entry.categories).toEqual([]);
     expect(entry.colors).toEqual([]);
     expect(entry.tags).toEqual([]);
   });
@@ -107,7 +109,7 @@ describe('round trips', () => {
       id: 'en_9',
       userId: 'mock-user-sprig',
       name: null,
-      category: 'flower',
+      categories: ['flower', 'seed_pod_dried'],
       colors: ['purple'],
       notes: '',
       photos: [],

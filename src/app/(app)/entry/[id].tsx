@@ -23,7 +23,7 @@ import {
 import { MiniMap } from '@/components/map/MiniMap';
 import { Text } from '@/components/Text';
 import { useToast } from '@/components/Toast';
-import { CategoryChip } from '@/features/entries/components/CategoryChip';
+import { CategoryChips } from '@/features/entries/components/CategoryChip';
 import { ColorDots } from '@/features/entries/components/ColorDots';
 import { PhotoGallery } from '@/features/entries/components/PhotoGallery';
 import { useEntries } from '@/features/entries/entriesStore';
@@ -120,7 +120,7 @@ export default function EntryDetailScreen() {
           </Text>
 
           <View style={styles.metaRow}>
-            <CategoryChip category={entry.category} size="md" />
+            <CategoryChips categories={entry.categories} size="md" />
             <ColorDots colors={entry.colors} size={14} />
           </View>
 

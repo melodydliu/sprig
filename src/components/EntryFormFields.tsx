@@ -11,7 +11,7 @@ import type { Category, ColorName, GeoPoint, LocationSource } from '@/types/entr
 
 export interface EntryFormValues {
   name: string | null;
-  category: Category;
+  categories: Category[];
   colors: ColorName[];
   notes: string;
   tags: string[];
@@ -47,8 +47,20 @@ export function EntryFormFields({
         returnKeyType="done"
       />
 
-      <Group label="CATEGORY">
-        <CategoryPicker value={values.category} onChange={(category) => onChange({ category })} />
+      <Group label="CATEGORIES">
+        <CategoryPicker
+          value={values.categories}
+          onToggle={(category) => {
+            const has = values.categories.includes(category);
+            // Keep at least one category selected.
+            if (has && values.categories.length === 1) return;
+            onChange({
+              categories: has
+                ? values.categories.filter((c) => c !== category)
+                : [...values.categories, category],
+            });
+          }}
+        />
       </Group>
 
       <Group label="COLORS">

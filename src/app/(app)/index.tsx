@@ -103,7 +103,7 @@ export default function JournalScreen() {
           data={visible}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <EntryCard entry={item} origin={origin} unit={units} />}
-          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+          ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
           contentContainerStyle={{
             paddingHorizontal: theme.spacing.lg,
             paddingTop: theme.spacing.xs,

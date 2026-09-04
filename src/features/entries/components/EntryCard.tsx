@@ -10,7 +10,7 @@ import { formatDistance } from '@/lib/geo';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { Entry, GeoPoint } from '@/types/entry';
 
-import { CategoryChip } from './CategoryChip';
+import { CategoryChips } from './CategoryChip';
 import { ColorDots } from './ColorDots';
 
 interface Props {
@@ -72,7 +72,7 @@ function EntryCardImpl({ entry, origin, unit = 'mi' }: Props) {
         </Text>
 
         <View style={styles.metaRow}>
-          <CategoryChip category={entry.category} />
+          <CategoryChips categories={entry.categories} />
           <ColorDots colors={entry.colors} />
         </View>
 
@@ -100,30 +100,28 @@ export const EntryCard = memo(EntryCardImpl);
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
     padding: 10,
+    gap: 12,
     borderWidth: StyleSheet.hairlineWidth,
   },
   thumbWrap: {
-    width: 92,
-    height: 92,
+    width: '100%',
+    aspectRatio: 4 / 3,
     borderRadius: 12,
     overflow: 'hidden',
   },
   thumb: { width: '100%', height: '100%' },
   fav: {
     position: 'absolute',
-    top: 6,
-    left: 6,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    top: 8,
+    left: 8,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  body: { flex: 1, justifyContent: 'center', gap: 7, paddingRight: 4 },
+  body: { gap: 7, paddingHorizontal: 4, paddingBottom: 2 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   footRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
 });

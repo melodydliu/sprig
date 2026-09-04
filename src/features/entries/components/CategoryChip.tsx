@@ -56,3 +56,14 @@ export function CategoryChip({ category, size = 'sm', style }: Props) {
     </View>
   );
 }
+
+/** One chip per category — drop into any wrapping flex-row alongside other meta. */
+export function CategoryChips({ categories, size = 'sm' }: { categories: Category[]; size?: 'sm' | 'md' }) {
+  return (
+    <>
+      {categories.map((category) => (
+        <CategoryChip key={category} category={category} size={size} />
+      ))}
+    </>
+  );
+}

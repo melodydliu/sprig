@@ -7,7 +7,7 @@ function entry(over: Partial<Entry>): Entry {
     id: 'en_1',
     userId: 'u1',
     name: null,
-    category: 'flower',
+    categories: ['flower'],
     colors: [],
     notes: '',
     photos: [],

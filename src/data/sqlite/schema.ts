@@ -54,6 +54,16 @@ export const MIGRATIONS: Migration[] = [
       )`,
     ],
   },
+  {
+    // `category` (single) -> `categories` (JSON array), so an entry can carry
+    // more than one — mirrors how `colors`/`tags` are already stored.
+    version: 2,
+    statements: [
+      `ALTER TABLE entries ADD COLUMN categories TEXT NOT NULL DEFAULT '[]'`,
+      `UPDATE entries SET categories = '["' || category || '"]'`,
+      `ALTER TABLE entries DROP COLUMN category`,
+    ],
+  },
 ];
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;

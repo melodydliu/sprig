@@ -19,7 +19,7 @@ function makeEntry(over: Partial<Entry> = {}): Entry {
     id: over.id ?? 'e1',
     userId: 'u1',
     name: 'Wild fennel',
-    category: 'foliage',
+    categories: ['foliage'],
     colors: ['green', 'yellow'],
     notes: 'along the bike path',
     photos: [],
@@ -64,10 +64,13 @@ describe('matchesSearch', () => {
 });
 
 describe('matchesFilter', () => {
-  it('filters by category (multi = OR)', () => {
-    const e = makeEntry({ category: 'flower' });
+  it('filters by category (multi = OR, on both sides)', () => {
+    const e = makeEntry({ categories: ['flower'] });
     expect(matchesFilter(e, filter({ categories: ['flower', 'foliage'] }))).toBe(true);
     expect(matchesFilter(e, filter({ categories: ['fruit_vegetable'] }))).toBe(false);
+
+    const multi = makeEntry({ categories: ['fruit_vegetable', 'branch_stem'] });
+    expect(matchesFilter(multi, filter({ categories: ['branch_stem'] }))).toBe(true);
   });
 
   it('filters by color (any overlap)', () => {
@@ -85,7 +88,7 @@ describe('matchesFilter', () => {
   });
 
   it('combines category + tag as AND across facets', () => {
-    const e = makeEntry({ category: 'flower', tags: ['spring'] });
+    const e = makeEntry({ categories: ['flower'], tags: ['spring'] });
     expect(matchesFilter(e, filter({ categories: ['flower'], tags: ['spring'] }))).toBe(true);
     expect(matchesFilter(e, filter({ categories: ['flower'], tags: ['winter'] }))).toBe(false);
   });
@@ -149,10 +152,10 @@ describe('compareEntries', () => {
 
 describe('runQuery', () => {
   const entries = [
-    makeEntry({ id: 'a', name: 'Acacia', category: 'flower', sightedAt: '2026-03-01T00:00:00.000Z' }),
-    makeEntry({ id: 'b', name: 'Bottlebrush', category: 'flower', isFavorite: true, sightedAt: '2026-05-01T00:00:00.000Z' }),
-    makeEntry({ id: 'c', name: 'Cedar', category: 'branch_stem', sightedAt: '2026-07-01T00:00:00.000Z' }),
-    makeEntry({ id: 'd', name: null, category: 'foliage', deletedAt: '2026-07-02T00:00:00.000Z' }),
+    makeEntry({ id: 'a', name: 'Acacia', categories: ['flower'], sightedAt: '2026-03-01T00:00:00.000Z' }),
+    makeEntry({ id: 'b', name: 'Bottlebrush', categories: ['flower'], isFavorite: true, sightedAt: '2026-05-01T00:00:00.000Z' }),
+    makeEntry({ id: 'c', name: 'Cedar', categories: ['branch_stem'], sightedAt: '2026-07-01T00:00:00.000Z' }),
+    makeEntry({ id: 'd', name: null, categories: ['foliage'], deletedAt: '2026-07-02T00:00:00.000Z' }),
   ];
 
   it('drops soft-deleted entries', () => {

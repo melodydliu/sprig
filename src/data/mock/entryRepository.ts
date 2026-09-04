@@ -79,7 +79,7 @@ class MockEntryRepository implements EntryRepository {
       id,
       userId: MOCK_USER_ID,
       name: draft.name?.trim() ? draft.name.trim() : null,
-      category: draft.category,
+      categories: draft.categories,
       colors: draft.colors,
       notes: draft.notes,
       photos,
@@ -102,7 +102,7 @@ class MockEntryRepository implements EntryRepository {
   async update(id: string, patch: Partial<EntryDraft>): Promise<Entry> {
     const entry = this.require(id);
     if (patch.name !== undefined) entry.name = patch.name?.trim() ? patch.name.trim() : null;
-    if (patch.category !== undefined) entry.category = patch.category;
+    if (patch.categories !== undefined) entry.categories = patch.categories;
     if (patch.colors !== undefined) entry.colors = patch.colors;
     if (patch.notes !== undefined) entry.notes = patch.notes;
     if (patch.location !== undefined) entry.location = patch.location;
@@ -210,6 +210,7 @@ class MockEntryRepository implements EntryRepository {
 function clone(entry: Entry): Entry {
   return {
     ...entry,
+    categories: [...entry.categories],
     colors: [...entry.colors],
     tags: [...entry.tags],
     photos: entry.photos.map((p) => ({ ...p })),

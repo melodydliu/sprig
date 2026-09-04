@@ -57,7 +57,7 @@ create table if not exists public.entries (
   id              text primary key,
   user_id         uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name            text,
-  category        text not null,
+  categories      text[] not null default '{}',
   colors          text[] not null default '{}',
   notes           text not null default '',
   location_lat    double precision,
@@ -71,6 +71,13 @@ create table if not exists public.entries (
   updated_at      timestamptz not null default now(),
   deleted_at      timestamptz
 );
+
+-- Migrating existing deployments: `category` (single) -> `categories` (array).
+-- Safe to re-run — each statement is a no-op once already applied.
+alter table public.entries add column if not exists categories text[] not null default '{}';
+update public.entries set categories = array[category]
+  where category is not null and categories = '{}';
+alter table public.entries drop column if exists category;
 
 create index if not exists entries_user_id_idx      on public.entries (user_id);
 create index if not exists entries_user_updated_idx on public.entries (user_id, updated_at);

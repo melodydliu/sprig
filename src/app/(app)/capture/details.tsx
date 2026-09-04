@@ -168,7 +168,7 @@ export default function CaptureDetailsScreen() {
           <EntryFormFields
             values={{
               name: draft.name,
-              category: draft.category,
+              categories: draft.categories,
               colors: draft.colors,
               notes: draft.notes,
               tags: draft.tags,

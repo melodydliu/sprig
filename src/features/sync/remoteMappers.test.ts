@@ -7,7 +7,7 @@ function entry(over: Partial<Entry>): Entry {
     id: 'en_1',
     userId: 'local-user',
     name: 'Wild fennel',
-    category: 'foliage',
+    categories: ['foliage'],
     colors: ['green', 'yellow'],
     notes: 'bike path',
     photos: [],
@@ -32,6 +32,7 @@ describe('entryToRemote', () => {
     expect(row.is_favorite).toBe(true);
     expect(row.location_lat).toBe(33.69);
     expect(row.location_lng).toBe(-118.04);
+    expect(row.categories).toEqual(['foliage']);
     expect(row.colors).toEqual(['green', 'yellow']);
     expect(row).not.toHaveProperty('syncStatus');
     expect(row).not.toHaveProperty('photos');

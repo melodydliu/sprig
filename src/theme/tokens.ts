@@ -113,7 +113,7 @@ const dark: Palette = {
 
 export const palettes: Record<ColorScheme, Palette> = { light, dark };
 
-/** Per-category accent colors, keyed by `Entry.category`. */
+/** Per-category accent colors, keyed by each entry in `Entry.categories`. */
 export const categoryColors: Record<
   string,
   { light: string; dark: string; softLight: string; softDark: string }

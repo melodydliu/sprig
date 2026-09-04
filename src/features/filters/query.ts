@@ -62,7 +62,10 @@ export function matchesFilter(
   filter: EntryFilter,
   origin?: GeoPoint | null,
 ): boolean {
-  if (filter.categories.length > 0 && !filter.categories.includes(entry.category)) {
+  if (
+    filter.categories.length > 0 &&
+    !filter.categories.some((c) => entry.categories.includes(c))
+  ) {
     return false;
   }
   if (filter.colors.length > 0 && !filter.colors.some((c) => entry.colors.includes(c))) {

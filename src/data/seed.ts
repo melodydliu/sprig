@@ -16,7 +16,7 @@ const DAY = 86_400_000;
 
 interface SeedSpec {
   name: string | null;
-  category: Category;
+  categories: Category[];
   colors: ColorName[];
   notes: string;
   images: SeedImageKey[];
@@ -33,7 +33,7 @@ interface SeedSpec {
 const SPECS: SeedSpec[] = [
   {
     name: 'Wild fennel',
-    category: 'foliage',
+    categories: ['foliage'],
     colors: ['green', 'yellow'],
     notes:
       'Huge stand of it along the bike path, taller than me. Smells like licorice when you brush past. The flower umbels are just starting to open — come back in ~2 weeks for the acid-yellow pollen heads, they are unreal in arrangements and last about a week in water. Watch for the dog-walkers in the morning, easier to cut midday.',
@@ -47,7 +47,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Nasturtium',
-    category: 'flower',
+    categories: ['flower'],
     colors: ['orange', 'red', 'yellow'],
     notes:
       'Spilling over a retaining wall on the corner. Neighbor said take as much as I want. Jewel tones, edible, but they wilt fast — cut early and condition in cold water.',
@@ -61,7 +61,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: null,
-    category: 'seed_pod_dried',
+    categories: ['seed_pod_dried'],
     colors: ['brown', 'cream'],
     notes: 'Some kind of dried pod on a tall stalk. Rattly. Need to ID.',
     images: ['pod-1'],
@@ -73,7 +73,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Pampas grass',
-    category: 'branch_stem',
+    categories: ['branch_stem'],
     colors: ['cream', 'white'],
     notes:
       'Three big clumps at the edge of the parking lot. Plumes are full and not shedding yet. Invasive here so nobody minds if I take a lot. Bring the loppers — stems are tough and the leaf edges cut like paper.',
@@ -86,7 +86,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Matilija poppy',
-    category: 'flower',
+    categories: ['flower'],
     colors: ['white', 'yellow'],
     notes:
       'The "fried egg" poppy. Enormous crepe-paper white petals, yellow center. Only a few open at a time so plan around it. Sap bleeds — sear the stems.',
@@ -100,7 +100,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Toyon berries',
-    category: 'fruit_vegetable',
+    categories: ['fruit_vegetable', 'branch_stem'],
     colors: ['red', 'green'],
     notes: 'Not ripe yet — still green. Mark for December, the branches are gorgeous for holiday work.',
     images: ['fruit-1'],
@@ -112,7 +112,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Eucalyptus (silver dollar)',
-    category: 'foliage',
+    categories: ['foliage'],
     colors: ['green', 'blue'],
     notes:
       'Long low branch hanging over the sidewalk, easy reach. Round juvenile leaves, very silvery. Someone already trims this so I do not feel bad taking a few stems.',
@@ -126,7 +126,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: null,
-    category: 'flower',
+    categories: ['flower'],
     colors: ['purple'],
     notes: '',
     images: ['flower-3'],
@@ -138,7 +138,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Statice',
-    category: 'flower',
+    categories: ['flower'],
     colors: ['purple', 'white'],
     notes: 'Papery, basically dries itself. Big patch gone a bit wild in an unmaintained yard.',
     images: ['flower-1', 'flower-2'],
@@ -150,7 +150,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Jacaranda',
-    category: 'branch_stem',
+    categories: ['branch_stem'],
     colors: ['purple', 'blue'],
     notes:
       'Street trees dropping blossoms everywhere. Can only get low branches or fallen ones but the color is worth it for one big statement piece. Very messy in the car.',
@@ -163,7 +163,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Rosemary',
-    category: 'foliage',
+    categories: ['foliage'],
     colors: ['green', 'blue'],
     notes: 'Massive hedge along the sidewalk, woody and huge. Little blue flowers right now. Smells amazing, good for wreaths.',
     images: ['foliage-3'],
@@ -175,7 +175,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: null,
-    category: 'other',
+    categories: ['other'],
     colors: ['multi'],
     notes:
       'Weird spiky architectural thing, almost like a small dragon fruit cactus but not. Growing out of a crack by the storm drain. Taking a photo now, will research before I try to cut anything — might be spiny or have irritating sap.',
@@ -188,7 +188,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'California buckwheat',
-    category: 'seed_pod_dried',
+    categories: ['seed_pod_dried'],
     colors: ['brown', 'pink', 'cream'],
     notes: 'Flower heads have gone rusty-pink and papery. Holds shape beautifully dried. Whole hillside of it.',
     images: ['pod-2'],
@@ -201,7 +201,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Lemon branches',
-    category: 'fruit_vegetable',
+    categories: ['fruit_vegetable', 'branch_stem', 'foliage'],
     colors: ['yellow', 'green'],
     notes: 'Tree branches hang way over the back fence into the alley. Fruit + glossy leaves + the odd blossom all at once. Owner waved, said help yourself.',
     images: ['fruit-2', 'fruit-3'],
@@ -214,7 +214,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Sea lavender',
-    category: 'flower',
+    categories: ['flower'],
     colors: ['purple'],
     notes: 'Hazy purple clouds of tiny flowers right at the edge of the marsh. Check the tide chart, the good patch is only reachable at low tide.',
     images: ['flower-3'],
@@ -226,7 +226,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: null,
-    category: 'foliage',
+    categories: ['foliage'],
     colors: ['green'],
     notes: 'Ferny green stuff in the shade under a big pine. Good filler if it holds up. Test a stem first.',
     images: ['foliage-1'],
@@ -237,7 +237,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Bottlebrush',
-    category: 'flower',
+    categories: ['flower'],
     colors: ['red'],
     notes: 'Big shrubs by the tennis courts, in full red bloom. Bees love it so go gently. Woody stems, bring snips.',
     images: ['flower-1'],
@@ -249,7 +249,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Pepper tree berries',
-    category: 'fruit_vegetable',
+    categories: ['fruit_vegetable', 'branch_stem'],
     colors: ['pink', 'red'],
     notes: 'Cascading clusters of tiny pink peppercorns. Delicate, drapes really nicely. Drops bits everywhere though.',
     images: ['fruit-1'],
@@ -262,7 +262,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Acacia',
-    category: 'flower',
+    categories: ['flower'],
     colors: ['yellow'],
     notes: 'First one blooming — fuzzy little yellow pompoms, whole tree glowing. Short window, maybe 10 days. Sneezy.',
     images: ['flower-2'],
@@ -274,7 +274,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: null,
-    category: 'branch_stem',
+    categories: ['branch_stem'],
     colors: ['brown'],
     notes:
       'Bare twisty branches on a shrub that dropped all its leaves. Really sculptural, almost black. No idea what it is but I want it for a tall bare-branch arrangement. Coming back with the good loppers and will ask the house if anyone is home.',
@@ -287,7 +287,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Wild mustard',
-    category: 'flower',
+    categories: ['flower'],
     colors: ['yellow', 'green'],
     notes: 'The whole vacant field turns yellow with it. Leggy and a bit weedy up close but a big loose armful in a bucket looks like spring itself.',
     images: ['flower-3'],
@@ -299,7 +299,7 @@ const SPECS: SeedSpec[] = [
   },
   {
     name: 'Dusty miller',
-    category: 'foliage',
+    categories: ['foliage'],
     colors: ['white', 'green'],
     notes: 'Silvery felted leaves in a commercial landscaping strip. Nobody will miss a few stems. Great cool-toned filler.',
     images: ['foliage-2'],
@@ -346,7 +346,7 @@ export async function buildSeedEntries(now: number = Date.now()): Promise<Entry[
       id,
       userId: MOCK_USER_ID,
       name: spec.name,
-      category: spec.category,
+      categories: spec.categories,
       colors: spec.colors,
       notes: spec.notes,
       photos,

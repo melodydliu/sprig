@@ -8,7 +8,7 @@ import { Crosshair } from 'lucide-react-native';
 
 import { Button } from '@/components/Button';
 import { Text } from '@/components/Text';
-import { CategoryChip, CATEGORY_ICONS } from '@/features/entries/components/CategoryChip';
+import { CategoryChips, CATEGORY_ICONS } from '@/features/entries/components/CategoryChip';
 import { useClusters } from '@/features/map/useClusters';
 import { useCurrentLocation } from '@/features/location/useCurrentLocation';
 import { relativeDate } from '@/lib/format';
@@ -112,7 +112,7 @@ export function JournalMap({ entries }: { entries: Entry[] }) {
               }}
               tracksViewChanges={false}
             >
-              <Pin category={c.entry?.category ?? 'other'} />
+              <Pin category={c.entry?.categories[0] ?? 'other'} />
             </Marker>
           ),
         )}
@@ -154,7 +154,7 @@ export function JournalMap({ entries }: { entries: Entry[] }) {
                     {selected.name ?? 'Unnamed'}
                   </Text>
                   <View style={styles.previewChips}>
-                    <CategoryChip category={selected.category} />
+                    <CategoryChips categories={selected.categories} />
                   </View>
                   <Text variant="caption" color="textMuted">
                     {relativeDate(selected.sightedAt)}
@@ -177,7 +177,7 @@ export function JournalMap({ entries }: { entries: Entry[] }) {
   );
 }
 
-function Pin({ category }: { category: Entry['category'] }) {
+function Pin({ category }: { category: Entry['categories'][number] }) {
   const theme = useTheme();
   const { color } = theme.categoryColor(category);
   const Icon = CATEGORY_ICONS[category];
@@ -229,5 +229,5 @@ const styles = StyleSheet.create({
   previewRow: { flexDirection: 'row', gap: 12 },
   previewThumb: { width: 74, height: 74, borderRadius: 12 },
   previewMeta: { flex: 1, gap: 6, justifyContent: 'center' },
-  previewChips: { flexDirection: 'row' },
+  previewChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
 });

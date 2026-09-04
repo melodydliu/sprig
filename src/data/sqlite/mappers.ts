@@ -12,7 +12,7 @@ export interface EntryRow {
   id: string;
   user_id: string;
   name: string | null;
-  category: string;
+  categories: string;
   colors: string;
   notes: string;
   location_lat: number | null;
@@ -71,7 +71,7 @@ export function rowToEntry(row: EntryRow, photoRows: PhotoRow[]): Entry {
     id: row.id,
     userId: row.user_id,
     name: row.name,
-    category: row.category as Entry['category'],
+    categories: parseStringArray(row.categories) as Entry['categories'],
     colors: parseStringArray(row.colors) as ColorName[],
     notes: row.notes,
     photos: photoRows
@@ -98,7 +98,7 @@ export function entryToRow(entry: Entry): EntryRow {
     id: entry.id,
     user_id: entry.userId,
     name: entry.name,
-    category: entry.category,
+    categories: JSON.stringify(entry.categories ?? []),
     colors: JSON.stringify(entry.colors ?? []),
     notes: entry.notes ?? '',
     location_lat: entry.location?.latitude ?? null,
@@ -134,7 +134,7 @@ export const ENTRY_COLUMNS: (keyof EntryRow)[] = [
   'id',
   'user_id',
   'name',
-  'category',
+  'categories',
   'colors',
   'notes',
   'location_lat',

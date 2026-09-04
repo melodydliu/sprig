@@ -64,7 +64,8 @@ export interface Entry {
   id: string;
   userId: string;
   name: string | null;
-  category: Category;
+  /** At least one category; the first is treated as primary for map pins etc. */
+  categories: Category[];
   colors: ColorName[];
   notes: string;
   photos: Photo[];
@@ -83,7 +84,7 @@ export interface Entry {
 /** Shape used by the capture/edit form before it becomes an Entry. */
 export interface EntryDraft {
   name: string | null;
-  category: Category;
+  categories: Category[];
   colors: ColorName[];
   notes: string;
   location: GeoPoint | null;
