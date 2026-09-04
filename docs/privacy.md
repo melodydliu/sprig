@@ -6,9 +6,6 @@ Sprig is a personal foraging journal. This policy explains what the app stores,
 where it goes, and the choices you have. It is written to be read, not to cover
 a company's back — Sprig is a small personal project.
 
-> **Before publishing:** replace `CONTACT_EMAIL_PLACEHOLDER` below with the email
-> address you want people to reach you at, and host this file at a public URL
-> (see `docs/README.md`). App Store Connect requires that URL.
 
 ## What Sprig stores
 
