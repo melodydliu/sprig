@@ -64,7 +64,8 @@ export default function EditEntryScreen() {
     useCallback(() => {
       const added = addPhotoDraft.consume();
       if (added && added.length && entry) void addPhotos(entry.id, added);
-    }, [addPhotoDraft, addPhotos, entry]),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
   );
 
   const photoInputs = useMemo(
