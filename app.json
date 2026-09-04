@@ -86,6 +86,12 @@
         "projectId": "21989f4d-a3b5-4855-b795-bb2cbd528ff2"
       }
     },
-    "owner": "melodydliu"
+    "owner": "melodydliu",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/21989f4d-a3b5-4855-b795-bb2cbd528ff2"
+    }
   }
 }
