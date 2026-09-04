@@ -1,7 +1,7 @@
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
 import { Link, useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowUpDown, List, Map as MapIcon, Plus, Settings, SlidersHorizontal } from 'lucide-react-native';
@@ -22,6 +22,7 @@ import { JournalMap } from '@/features/map/JournalMap';
 import { useSettings } from '@/features/settings/settingsStore';
 import { syncEngine } from '@/features/sync';
 import { SyncStatusBar } from '@/features/sync/components/SyncStatusBar';
+import { useSync } from '@/features/sync/syncStore';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function JournalScreen() {
@@ -33,6 +34,7 @@ export default function JournalScreen() {
   const { search, filter, sort, viewMode, setViewMode } = useFilters();
   const { point: origin } = useCurrentLocation();
   const units = useSettings((s) => s.units);
+  const appliedRevision = useSync((s) => s.appliedRevision);
 
   const filterSheet = useRef<BottomSheetModal>(null);
   const sortSheet = useRef<BottomSheetModal>(null);
@@ -42,6 +44,11 @@ export default function JournalScreen() {
       void load();
     }, [load]),
   );
+
+  // A sync pass pulled remote changes — refresh the in-memory set.
+  useEffect(() => {
+    if (appliedRevision > 0) void load({ force: true });
+  }, [appliedRevision, load]);
 
   const visible = useMemo(
     () => runQuery(all, { search, filter, sort, origin }),

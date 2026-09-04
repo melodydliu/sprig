@@ -30,7 +30,10 @@ async function onUser(user: AuthUser | null): Promise<void> {
   const uid = user?.id ?? null;
   useAuth.setState({ user, status: user ? 'authed' : 'unauthed' });
   if (uid === lastUserId) return;
+  const firstCall = lastUserId === undefined;
   lastUserId = uid;
+  // Cold start while already signed out — nothing to reconcile.
+  if (firstCall && uid === null) return;
 
   try {
     await reconcileLocalAccount(uid);
@@ -40,8 +43,15 @@ async function onUser(user: AuthUser | null): Promise<void> {
   useEntries.getState().reset();
 
   if (uid) {
+    // Pull the account's rows before the first paint so a returning user (or a
+    // new device) lands on their journal, not a blank one. Best effort — if the
+    // network is down we still show whatever is cached.
+    try {
+      await syncEngine.syncNow();
+    } catch (err) {
+      console.warn('[sprig] initial sync failed', err);
+    }
     await useEntries.getState().load({ force: true });
-    syncEngine.requestSync();
   }
 }
 

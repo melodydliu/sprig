@@ -8,6 +8,8 @@ interface SyncState {
   pending: number;
   lastSyncedAt: string | null;
   error: string | null;
+  /** Bumped whenever a pull applied remote changes — screens reload on it. */
+  appliedRevision: number;
   set: (patch: Partial<SyncState>) => void;
 }
 
@@ -21,5 +23,6 @@ export const useSync = create<SyncState>((set) => ({
   pending: 0,
   lastSyncedAt: null,
   error: null,
+  appliedRevision: 0,
   set: (patch) => set(patch),
 }));

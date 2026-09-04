@@ -97,6 +97,7 @@ export function createSyncEngine(deps: SyncDeps): SyncEngine {
     const passStart = new Date().toISOString();
     useSync.getState().set({ status: 'syncing', error: null });
     let hadError = false;
+    let applied = 0;
 
     try {
       // ---- PUSH ----
@@ -120,6 +121,7 @@ export function createSyncEngine(deps: SyncDeps): SyncEngine {
         for (const r of remote) {
           if (mergeRemote(localById.get(r.id), r) !== 'skip') {
             await deps.applyRemoteEntry(r);
+            applied += 1;
           }
         }
         if (!hadError) await deps.setMeta(LAST_PULLED_KEY, passStart);
@@ -130,11 +132,13 @@ export function createSyncEngine(deps: SyncDeps): SyncEngine {
 
       const after = await deps.loadLocalEntries();
       const pending = after.filter((e) => e.syncStatus !== 'synced').length;
-      useSync.getState().set({
+      const s = useSync.getState();
+      s.set({
         status: hadError ? 'error' : 'idle',
         pending,
-        lastSyncedAt: hadError ? useSync.getState().lastSyncedAt : passStart,
+        lastSyncedAt: hadError ? s.lastSyncedAt : passStart,
         error: hadError ? 'Some changes didn’t sync — will retry' : null,
+        appliedRevision: applied > 0 ? s.appliedRevision + 1 : s.appliedRevision,
       });
     } finally {
       running = false;
