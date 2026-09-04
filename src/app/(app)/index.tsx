@@ -61,7 +61,7 @@ export default function JournalScreen() {
     <Screen padded={false}>
       <View style={styles.header}>
         <View style={styles.titleRow}>
-          <Sprig size={24} color={theme.colors.primary} />
+          <Sprig size={24} />
           <Text variant="display">Journal</Text>
         </View>
         <View style={styles.headerRight}>
@@ -236,7 +236,7 @@ function EmptyState({ hasEntries }: { hasEntries: boolean }) {
           { backgroundColor: theme.colors.primarySoft, borderRadius: theme.radius.xl },
         ]}
       >
-        <Sprig size={54} color={theme.colors.primary} />
+        <Sprig size={54} />
       </View>
       <Text variant="title" center>
         {hasEntries ? 'Nothing matches' : 'Spot something?'}
