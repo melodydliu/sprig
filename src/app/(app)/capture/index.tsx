@@ -1,7 +1,7 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Device from 'expo-device';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,9 +9,11 @@ import { Images, RefreshCw, X, Zap, ZapOff } from 'lucide-react-native';
 
 import { Button } from '@/components/Button';
 import { Text } from '@/components/Text';
+import { useAddPhotoDraft } from '@/features/capture/addPhotoDraftStore';
 import { useCaptureDraft } from '@/features/capture/captureDraftStore';
 import { MAX_PHOTOS, pickFromLibrary } from '@/features/capture/imageSource';
 import { useCurrentLocation } from '@/features/location/useCurrentLocation';
+import type { PhotoInput } from '@/data/repositories';
 
 const hasCameraHardware = Device.isDevice; // Simulator => false
 
@@ -27,9 +29,18 @@ export default function CaptureCameraScreen() {
   const { point: gpsPoint, request: requestLocation } = useCurrentLocation();
   const libraryOpened = useRef(false);
 
-  // Start from a clean draft every time capture opens.
+  // Pushed on top of an in-progress entry (new-entry details, or editing a
+  // saved one) to add one more photo, rather than starting a fresh capture.
+  const params = useLocalSearchParams<{ mode?: string; count?: string }>();
+  const isAddMode = params.mode === 'add';
+  const existingCount = isAddMode ? Number(params.count ?? 0) : draft.photos.length;
+  const addPhotoDraft = useAddPhotoDraft();
+
+  // Start from a clean draft every time a fresh capture opens — but not when
+  // we're just adding a photo to an entry that's already in progress, or
+  // this would wipe it out from under the screen it was pushed on top of.
   useEffect(() => {
-    draft.reset();
+    if (!isAddMode) draft.reset();
     void requestLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -47,17 +58,22 @@ export default function CaptureCameraScreen() {
   );
 
   const handleLibrary = useCallback(async () => {
-    const remaining = MAX_PHOTOS - draft.photos.length;
+    const remaining = MAX_PHOTOS - existingCount;
     const picked = await pickFromLibrary(remaining);
     if (picked.length === 0) {
-      if (!hasCameraHardware && draft.photos.length === 0) router.back();
+      if (!isAddMode && !hasCameraHardware && draft.photos.length === 0) router.back();
+      return;
+    }
+    if (isAddMode) {
+      addPhotoDraft.commit(picked);
+      router.back();
       return;
     }
     draft.addPhotos(picked);
     const exif = picked.find((p) => p.exifLocation)?.exifLocation ?? null;
     if (exif) draft.setExifLocation(exif);
     goToDetails({ fromLibrary: true });
-  }, [draft, goToDetails, router]);
+  }, [draft, goToDetails, router, isAddMode, existingCount, addPhotoDraft]);
 
   // No camera in the Simulator: jump straight to the library once.
   useEffect(() => {
@@ -74,15 +90,24 @@ export default function CaptureCameraScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       const photo = await cameraRef.current.takePictureAsync({ quality: 0.75, exif: true });
       if (photo) {
-        draft.addPhotos([
-          { uri: photo.uri, width: photo.width, height: photo.height, takenAt: new Date().toISOString() },
-        ]);
-        goToDetails();
+        const input: PhotoInput = {
+          uri: photo.uri,
+          width: photo.width,
+          height: photo.height,
+          takenAt: new Date().toISOString(),
+        };
+        if (isAddMode) {
+          addPhotoDraft.commit([input]);
+          router.back();
+        } else {
+          draft.addPhotos([input]);
+          goToDetails();
+        }
       }
     } finally {
       setBusy(false);
     }
-  }, [busy, draft, goToDetails]);
+  }, [busy, draft, goToDetails, isAddMode, addPhotoDraft, router]);
 
   // --- Permission gates -------------------------------------------------------
 

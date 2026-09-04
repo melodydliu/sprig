@@ -7,7 +7,8 @@ import { Button } from '@/components/Button';
 import { EntryFormFields, type EntryFormValues } from '@/components/EntryFormFields';
 import { Text } from '@/components/Text';
 import { useToast } from '@/components/Toast';
-import { MAX_PHOTOS, pickFromLibrary } from '@/features/capture/imageSource';
+import { useAddPhotoDraft } from '@/features/capture/addPhotoDraftStore';
+import { MAX_PHOTOS } from '@/features/capture/imageSource';
 import { PhotoStrip } from '@/features/capture/PhotoStrip';
 import { useEntries } from '@/features/entries/entriesStore';
 import { useLocationDraft } from '@/features/location/locationDraftStore';
@@ -25,6 +26,7 @@ export default function EditEntryScreen() {
   const addPhotos = useEntries((s) => s.addPhotos);
   const removePhoto = useEntries((s) => s.removePhoto);
   const locationDraft = useLocationDraft();
+  const addPhotoDraft = useAddPhotoDraft();
   const [saving, setSaving] = useState(false);
 
   const [values, setValues] = useState<EntryFormValues | null>(() =>
@@ -55,6 +57,14 @@ export default function EditEntryScreen() {
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []),
+  );
+
+  // Pick up photo(s) added via the camera screen pushed in add mode.
+  useFocusEffect(
+    useCallback(() => {
+      const added = addPhotoDraft.consume();
+      if (added && added.length && entry) void addPhotos(entry.id, added);
+    }, [addPhotoDraft, addPhotos, entry]),
   );
 
   const photoInputs = useMemo(
@@ -89,9 +99,8 @@ export default function EditEntryScreen() {
     router.push('/location');
   };
 
-  const handleAddPhotos = async () => {
-    const picked = await pickFromLibrary(MAX_PHOTOS - entry.photos.length);
-    if (picked.length) await addPhotos(entry.id, picked);
+  const handleAddPhotos = () => {
+    router.push({ pathname: '/capture', params: { mode: 'add', count: String(entry.photos.length) } });
   };
 
   const handleRemovePhoto = async (index: number) => {

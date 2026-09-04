@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,8 +8,9 @@ import { Button } from '@/components/Button';
 import { EntryFormFields } from '@/components/EntryFormFields';
 import { Text } from '@/components/Text';
 import { useToast } from '@/components/Toast';
+import { useAddPhotoDraft } from '@/features/capture/addPhotoDraftStore';
 import { useCaptureDraft } from '@/features/capture/captureDraftStore';
-import { MAX_PHOTOS, pickFromLibrary } from '@/features/capture/imageSource';
+import { MAX_PHOTOS } from '@/features/capture/imageSource';
 import { PhotoStrip } from '@/features/capture/PhotoStrip';
 import { useEntries } from '@/features/entries/entriesStore';
 import { reverseGeocode } from '@/features/location/geocode';
@@ -26,11 +27,17 @@ export default function CaptureDetailsScreen() {
 
   const draft = useCaptureDraft();
   const locationDraft = useLocationDraft();
+  const addPhotoDraft = useAddPhotoDraft();
   const [saving, setSaving] = useState(false);
   const { point: gpsPoint } = useCurrentLocation();
+  // Set right before draft.reset() on save/cancel, so the empty-photos guard
+  // below doesn't mistake "we just cleared the draft to leave" for "landed
+  // here with no photos" and bounce back to the camera instead of wherever
+  // we're actually navigating to.
+  const leavingRef = useRef(false);
 
   useEffect(() => {
-    if (draft.photos.length === 0) router.replace('/capture');
+    if (draft.photos.length === 0 && !leavingRef.current) router.replace('/capture');
   }, [draft.photos.length, router]);
 
   // Backfill GPS if the camera screen didn't get a fix in time.
@@ -70,6 +77,19 @@ export default function CaptureDetailsScreen() {
     }, []),
   );
 
+  // Pick up photo(s) added via the camera screen pushed in add mode.
+  useFocusEffect(
+    useCallback(() => {
+      const added = addPhotoDraft.consume();
+      if (added && added.length) {
+        draft.addPhotos(added);
+        const exif = added.find((p) => p.exifLocation)?.exifLocation;
+        if (exif && !draft.exifLocation) draft.setExifLocation(exif);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
+  );
+
   const openLocationPicker = () => {
     locationDraft.seed(draft.location, draft.locationLabel, draft.locationSource);
     router.push('/location');
@@ -96,6 +116,7 @@ export default function CaptureDetailsScreen() {
     try {
       await createEntry(draft.toDraft(), draft.photos);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      leavingRef.current = true;
       draft.reset();
       router.replace('/');
       toast.show('Saved', 'success');
@@ -106,17 +127,13 @@ export default function CaptureDetailsScreen() {
   };
 
   const handleCancel = () => {
+    leavingRef.current = true;
     draft.reset();
     router.replace('/');
   };
 
-  const addMorePhotos = async () => {
-    const picked = await pickFromLibrary(MAX_PHOTOS - draft.photos.length);
-    if (picked.length) {
-      draft.addPhotos(picked);
-      const exif = picked.find((p) => p.exifLocation)?.exifLocation;
-      if (exif && !draft.exifLocation) draft.setExifLocation(exif);
-    }
+  const addMorePhotos = () => {
+    router.push({ pathname: '/capture', params: { mode: 'add', count: String(draft.photos.length) } });
   };
 
   return (
