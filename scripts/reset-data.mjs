@@ -6,7 +6,7 @@
  */
 import { execSync } from 'node:child_process';
 
-const BUNDLE_ID = 'com.sprig.app';
+const BUNDLE_ID = 'com.sprigbook.app';
 
 try {
   execSync(`xcrun simctl uninstall booted ${BUNDLE_ID}`, { stdio: 'inherit' });

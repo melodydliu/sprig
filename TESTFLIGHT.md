@@ -25,7 +25,7 @@ Commit the `app.json` change `eas init` makes.
 - Platform: **iOS**
 - Name: **Sprig** — if that exact name is taken App-Store-wide, try `Sprig — Foraging Journal`
 - Primary language: **English (U.S.)**
-- Bundle ID: **com.sprig.app** — if it's not in the dropdown, let step 3 register
+- Bundle ID: **com.sprigbook.app** — if it's not in the dropdown, let step 3 register
   it (EAS offers to), or add it manually at
   developer.apple.com → Certificates, IDs & Profiles → Identifiers → **+** → App IDs
 - SKU: any unique string, e.g. `sprig-001`
@@ -40,7 +40,7 @@ npm run build:ios           # = eas build --platform ios --profile production
 First run prompts:
 - Log in to your Apple account → **let EAS manage credentials** (yes) — it
   creates the distribution certificate + provisioning profile for you.
-- Register `com.sprig.app` if it asks.
+- Register `com.sprigbook.app` if it asks.
 - Set the initial version → accept **1.0.0**, build **1**.
 
 The build runs on Expo's servers (~15–25 min, may queue on the free plan). You

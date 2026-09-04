@@ -239,7 +239,7 @@ Still open (asked at the pause, not yet answered):
   - temporary route redirects in `src/app/(app)/index.tsx` (revert with
     `git checkout --`, NOT hand-made backups — a backup bit us once),
   - `xcrun simctl ui booted appearance dark|light`,
-  - `xcrun simctl privacy booted grant photos|camera|location-always com.sprig.app`,
+  - `xcrun simctl privacy booted grant photos|camera|location-always com.sprigbook.app`,
   - `xcrun simctl location booted set 33.6595,-117.9988`.
   - Ask the user to tap-through the interactive bits (capture Save, gestures).
 - This shell is **zsh** — unquoted `$var` does NOT word-split; use arrays.

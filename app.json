@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sprig.app",
+      "bundleIdentifier": "com.sprigbook.app",
       "infoPlist": {
         "NSCameraUsageDescription": "Sprig uses the camera so you can photograph a plant the moment you spot it.",
         "NSPhotoLibraryUsageDescription": "Sprig lets you add photos from your library to a find.",
@@ -20,7 +20,7 @@
       }
     },
     "android": {
-      "package": "com.sprig.app",
+      "package": "com.sprigbook.app",
       "adaptiveIcon": {
         "backgroundColor": "#FAF6EE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
