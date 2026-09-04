@@ -11,7 +11,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sprig.app",
-      "buildNumber": "1",
       "infoPlist": {
         "NSCameraUsageDescription": "Sprig uses the camera so you can photograph a plant the moment you spot it.",
         "NSPhotoLibraryUsageDescription": "Sprig lets you add photos from your library to a find.",
@@ -47,11 +46,12 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#FAF6EE",
-          "dark": {
-            "backgroundColor": "#181611"
-          },
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 84
+          "imageWidth": 120,
+          "dark": {
+            "backgroundColor": "#181611",
+            "image": "./assets/images/splash-icon-dark.png"
+          }
         }
       ],
       [
@@ -69,7 +69,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Sprig tags each find with where you saw it so you can come back later. Location is stored only on your device."
+          "locationWhenInUsePermission": "Sprig tags each find with where you saw it so you can come back later. Location is saved to your private journal and its cloud backup."
         }
       ],
       "@react-native-community/datetimepicker",

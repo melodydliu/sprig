@@ -178,18 +178,29 @@ Still open (not blocking TestFlight):
   reset are reliable for friends — needed before wider sharing.
 - The 6 UI/UX polish questions (below) — deferred until after real use.
 
-### Phase 3 — EAS Build + TestFlight (next session)
+### Phase 3 — EAS Build + TestFlight
 
-- `npm i -g eas-cli`; **user runs** `eas login` (free Expo account).
-- `eas init` → writes `extra.eas.projectId` + `owner` to `app.json`.
-- `eas.json`: `development` / `preview` / `production` profiles; `production`
-  sets `autoIncrement: true` + the `EXPO_PUBLIC_SUPABASE_*` env vars (publishable
-  keys, safe to bake in).
-- **User does:** App Store Connect → create the app record (bundle
-  `com.sprig.app`, name "Sprig"), accept agreements, TestFlight internal group.
-- `eas build -p ios --profile production` → `eas submit -p ios` → TestFlight in
-  ~30–60 min. Install via the TestFlight app.
-- For friends: external group + beta privacy questionnaire + ~1 day Apple review.
+Prepped this session:
+
+- `eas.json` — `development` / `preview` / `production` profiles;
+  `appVersionSource: remote` + `production.autoIncrement`; `production.env`
+  carries `EXPO_PUBLIC_SUPABASE_*` (publishable keys — safe to commit; RLS-gated).
+- **Real app icon** — `assets/images/icon.png` (1024², opaque) generated from the
+  `Sprig` glyph by `scripts/generate-app-icon.mjs` (`npm run gen-app-icon`);
+  matching light/dark `splash-icon*.png`; splash `imageWidth` 84 → 120. The old
+  `icon.png` was the blue Expo placeholder.
+- `app.json` — dropped `ios.buildNumber` (remote source owns it); fixed the
+  `expo-location` plugin permission string (was "device only").
+- `npm run build:ios` / `submit:ios` scripts.
+- **`TESTFLIGHT.md`** — full click-by-click walkthrough.
+
+**User runs** (see `TESTFLIGHT.md`): free Expo account → `eas login` → `eas init`
+(commit the app.json change) → create the App Store Connect app record →
+`npm run build:ios` → `npm run submit:ios` → add self as internal tester →
+install via the TestFlight app.
+
+Before sharing with friends: custom SMTP (Resend / SES free tier) so
+confirmation + reset emails are reliable; then a TestFlight external group.
 
 ---
 

@@ -73,7 +73,10 @@
     "gen-seed-images": "node ./scripts/generate-seed-images.mjs",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "gen-app-icon": "node ./scripts/generate-app-icon.mjs",
+    "build:ios": "eas build --platform ios --profile production",
+    "submit:ios": "eas submit --platform ios --latest"
   },
   "jest": {
     "preset": "jest-expo",
