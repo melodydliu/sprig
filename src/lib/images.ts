@@ -11,13 +11,16 @@ import type { PhotoInput } from '@/data/repositories';
  * Photo *bytes* always live as files in the FileSystem `photos/` directory —
  * only the index of which photo belongs to which entry moves between the mock
  * and SQLite layers. Captured images are downscaled (long edge <= 1600px) and
- * given a small thumbnail for lists/markers.
+ * given a thumbnail for lists/markers.
  */
 
 export const MAX_LONG_EDGE = 1600;
-export const THUMB_LONG_EDGE = 420;
+// Sized for the Journal list's full-width photo cards (~380-400pt wide, so
+// up to ~1150px @3x) plus map-marker previews, not the old 92pt thumbnail —
+// keep in sync with EntryCard's card width if that layout changes.
+export const THUMB_LONG_EDGE = 1080;
 const FULL_QUALITY = 0.8;
-const THUMB_QUALITY = 0.7;
+const THUMB_QUALITY = 0.75;
 
 function photosDir(): Directory {
   const dir = new Directory(Paths.document, 'photos');
@@ -112,6 +115,34 @@ export async function ingestPhoto(
     height: full.height,
     takenAt: input.takenAt ?? null,
   };
+}
+
+/**
+ * Re-derives a photo's thumbnail from its already-downscaled full image, at
+ * the current `THUMB_LONG_EDGE`. Used to upgrade thumbnails that were
+ * generated back when the list view used a small square thumb — writes to a
+ * new filename (rather than overwriting in place) so image-caching layers
+ * can't serve the stale, lower-res bytes for the old URI. Returns `null` on
+ * any failure so a caller can just leave the existing thumbnail alone.
+ */
+export async function regenerateThumbnail(
+  base: string,
+  fullUri: string,
+  fullWidth: number,
+  fullHeight: number,
+): Promise<{ uri: string; width: number; height: number } | null> {
+  try {
+    return await resizeToFile(
+      fullUri,
+      fullWidth,
+      fullHeight,
+      THUMB_LONG_EDGE,
+      THUMB_QUALITY,
+      `${base}_thumb2.jpg`,
+    );
+  } catch {
+    return null;
+  }
 }
 
 /** Best-effort removal of the on-disk files for a photo. */

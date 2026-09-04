@@ -19,6 +19,7 @@ import {
 } from './mappers';
 import { sqlitePhotoRepository } from './photoRepository';
 import { loadEntries, loadEntry } from './read';
+import { upgradeThumbnailsOnce } from './upgradeThumbnails';
 
 const ENTRY_INSERT = buildInsert('entries', ENTRY_COLUMNS);
 const PHOTO_INSERT = buildInsert('photos', PHOTO_COLUMNS);
@@ -39,6 +40,7 @@ const nowIso = () => new Date().toISOString();
  */
 class SqliteEntryRepository implements EntryRepository {
   private resetInFlight: Promise<void> | null = null;
+  private thumbnailUpgradeInFlight: Promise<void> | null = null;
 
   /**
    * A signed-in account starts with an empty journal and pulls its rows from
@@ -49,6 +51,10 @@ class SqliteEntryRepository implements EntryRepository {
   private async ready(): Promise<SQLiteDatabase> {
     const db = await getDb();
     if (this.resetInFlight) await this.resetInFlight;
+    if (!this.thumbnailUpgradeInFlight) {
+      this.thumbnailUpgradeInFlight = upgradeThumbnailsOnce(db).catch(() => {});
+    }
+    await this.thumbnailUpgradeInFlight;
     return db;
   }
 
