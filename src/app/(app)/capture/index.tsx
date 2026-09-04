@@ -197,6 +197,7 @@ function RoundButton({
   return (
     <Pressable
       onPress={onPress}
+      hitSlop={12}
       style={({ pressed }) => [
         styles.round,
         { backgroundColor: active ? '#FFD86B' : 'rgba(0,0,0,0.45)', opacity: pressed ? 0.7 : 1 },
@@ -253,7 +254,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'android' ? 16 : 4,
+    // Beyond the safe-area inset: on some iPhones (notably around the Dynamic
+    // Island / status bar) that inset alone still leaves this row close
+    // enough to the edge that system gestures can steal the touch before it
+    // reaches the button.
+    paddingTop: Platform.OS === 'android' ? 16 : 12,
   },
   bottomRow: {
     flexDirection: 'row',
@@ -274,7 +279,7 @@ const styles = StyleSheet.create({
   },
   shutterInner: { width: 58, height: 58, borderRadius: 29, backgroundColor: '#fff' },
   fallbackWrap: { flex: 1, backgroundColor: '#111' },
-  fallbackTop: { paddingHorizontal: 20, paddingTop: 4 },
+  fallbackTop: { paddingHorizontal: 20, paddingTop: 12 },
   fallbackBody: { flex: 1, justifyContent: 'center', paddingHorizontal: 32, gap: 12 },
   fallbackButtons: { gap: 10, marginTop: 16, alignSelf: 'stretch' },
 });
