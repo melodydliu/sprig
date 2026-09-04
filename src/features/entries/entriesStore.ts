@@ -13,6 +13,8 @@ interface EntriesState {
   error: string | null;
 
   load: (opts?: { force?: boolean; refreshing?: boolean }) => Promise<void>;
+  /** Drop the in-memory set (used on sign-in/sign-out account swaps). */
+  reset: () => void;
   getById: (id: string) => Entry | undefined;
   create: (draft: EntryDraft, photos: PhotoInput[]) => Promise<Entry>;
   update: (id: string, patch: Partial<EntryDraft>) => Promise<Entry>;
@@ -51,6 +53,8 @@ export const useEntries = create<EntriesState>((set, get) => ({
       set({ loading: false, refreshing: false });
     }
   },
+
+  reset: () => set({ all: [], loaded: false, loading: false, refreshing: false, error: null }),
 
   getById: (id) => get().all.find((e) => e.id === id),
 

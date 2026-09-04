@@ -80,10 +80,13 @@ export interface PhotoRepository {
 
 export interface AuthService {
   getCurrentUser(): Promise<AuthUser | null>;
-  signInWithPassword(email: string, password: string): Promise<AuthUser>;
-  signInWithApple(): Promise<AuthUser>;
-  signInWithGoogle(): Promise<AuthUser>;
+  signUp(email: string, password: string): Promise<AuthUser>;
+  signIn(email: string, password: string): Promise<AuthUser>;
   signOut(): Promise<void>;
+  /** Sends a password-reset email that deep-links back into the app. */
+  sendPasswordReset(email: string): Promise<void>;
+  /** Completes a reset once the deep link has opened the app. */
+  updatePassword(newPassword: string): Promise<void>;
   /** Fires whenever the session changes; returns an unsubscribe fn. */
   onAuthStateChange(cb: (user: AuthUser | null) => void): () => void;
 }

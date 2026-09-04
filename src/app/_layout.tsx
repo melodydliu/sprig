@@ -89,6 +89,8 @@ function RootNavigator({ signedIn }: { signedIn: boolean }) {
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
+      {/* Reachable in both states: from the sign-in link and the reset-email deep link. */}
+      <Stack.Screen name="reset-password" />
     </Stack>
   );
 }

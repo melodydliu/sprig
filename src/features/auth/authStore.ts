@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 
 import { authService } from '@/data';
+import { useEntries } from '@/features/entries/entriesStore';
+import { syncEngine } from '@/features/sync';
+import { reconcileLocalAccount } from '@/features/sync/account';
 import type { AuthUser } from '@/types/entry';
 
 type Status = 'loading' | 'authed' | 'unauthed';
@@ -11,11 +14,50 @@ interface AuthState {
   error: string | null;
   submitting: boolean;
   bootstrap: () => Promise<void>;
-  signInWithPassword: (email: string, password: string) => Promise<void>;
-  signInWithApple: () => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
+  signUp: (email: string, password: string) => Promise<boolean>;
+  signIn: (email: string, password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
+  sendPasswordReset: (email: string) => Promise<boolean>;
+  updatePassword: (password: string) => Promise<boolean>;
   clearError: () => void;
+}
+
+/** The last user id we reconciled local data for — guards against re-running on
+ *  token refreshes, which fire `onAuthStateChange` with the same user. */
+let lastUserId: string | null | undefined;
+
+async function onUser(user: AuthUser | null): Promise<void> {
+  const uid = user?.id ?? null;
+  useAuth.setState({ user, status: user ? 'authed' : 'unauthed' });
+  if (uid === lastUserId) return;
+  lastUserId = uid;
+
+  try {
+    await reconcileLocalAccount(uid);
+  } catch (err) {
+    console.warn('[sprig] account reconcile failed', err);
+  }
+  useEntries.getState().reset();
+
+  if (uid) {
+    await useEntries.getState().load({ force: true });
+    syncEngine.requestSync();
+  }
+}
+
+async function attempt(
+  set: (p: Partial<AuthState>) => void,
+  fn: () => Promise<void>,
+): Promise<boolean> {
+  set({ submitting: true, error: null });
+  try {
+    await fn();
+    set({ submitting: false });
+    return true;
+  } catch (err) {
+    set({ submitting: false, error: (err as Error).message });
+    return false;
+  }
 }
 
 export const useAuth = create<AuthState>((set) => ({
@@ -25,47 +67,37 @@ export const useAuth = create<AuthState>((set) => ({
   submitting: false,
 
   bootstrap: async () => {
-    const user = await authService.getCurrentUser();
-    set({ user, status: user ? 'authed' : 'unauthed' });
+    try {
+      await onUser(await authService.getCurrentUser());
+    } catch {
+      set({ status: 'unauthed' });
+    }
     authService.onAuthStateChange((next) => {
-      set({ user: next, status: next ? 'authed' : 'unauthed' });
+      void onUser(next);
     });
   },
 
-  signInWithPassword: async (email, password) => {
-    set({ submitting: true, error: null });
-    try {
-      const user = await authService.signInWithPassword(email, password);
-      set({ user, status: 'authed', submitting: false });
-    } catch (err) {
-      set({ submitting: false, error: (err as Error).message });
-    }
-  },
+  signUp: (email, password) =>
+    attempt(set, async () => {
+      await onUser(await authService.signUp(email, password));
+    }),
 
-  signInWithApple: async () => {
-    set({ submitting: true, error: null });
-    try {
-      const user = await authService.signInWithApple();
-      set({ user, status: 'authed', submitting: false });
-    } catch (err) {
-      set({ submitting: false, error: (err as Error).message });
-    }
-  },
-
-  signInWithGoogle: async () => {
-    set({ submitting: true, error: null });
-    try {
-      const user = await authService.signInWithGoogle();
-      set({ user, status: 'authed', submitting: false });
-    } catch (err) {
-      set({ submitting: false, error: (err as Error).message });
-    }
-  },
+  signIn: (email, password) =>
+    attempt(set, async () => {
+      await onUser(await authService.signIn(email, password));
+    }),
 
   signOut: async () => {
-    await authService.signOut();
-    set({ user: null, status: 'unauthed' });
+    try {
+      await authService.signOut();
+    } finally {
+      await onUser(null);
+    }
   },
+
+  sendPasswordReset: (email) => attempt(set, () => authService.sendPasswordReset(email)),
+
+  updatePassword: (password) => attempt(set, () => authService.updatePassword(password)),
 
   clearError: () => set({ error: null }),
 }));

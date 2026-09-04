@@ -38,29 +38,18 @@ const nowIso = () => new Date().toISOString();
  * non-deleted row and hand it to the same `runQuery` the mock used.
  */
 class SqliteEntryRepository implements EntryRepository {
-  private seeded: Promise<void> | null = null;
+  private resetInFlight: Promise<void> | null = null;
 
+  /**
+   * A signed-in account starts with an empty journal and pulls its rows from
+   * the cloud — there's no auto-seed. `resetToSampleData()` loads the demo set
+   * on demand (Settings ▸ Developer, or `npm run reset-data`). This guard just
+   * makes reads wait out an in-progress reset.
+   */
   private async ready(): Promise<SQLiteDatabase> {
     const db = await getDb();
-    if (!this.seeded) this.seeded = this.ensureSeeded(db);
-    await this.seeded;
+    if (this.resetInFlight) await this.resetInFlight;
     return db;
-  }
-
-  /** Clean-seed on first run: no import from the old AsyncStorage mock data. */
-  private async ensureSeeded(db: SQLiteDatabase): Promise<void> {
-    const flag = await db.getFirstAsync<{ value: string }>(
-      'SELECT value FROM meta WHERE key = ?',
-      'seeded',
-    );
-    if (flag?.value === 'true') return;
-
-    const count = await db.getFirstAsync<{ n: number }>('SELECT COUNT(*) AS n FROM entries');
-    if ((count?.n ?? 0) === 0) {
-      const entries = await buildSeedEntries();
-      await this.insertEntries(db, entries);
-    }
-    await db.runAsync('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)', 'seeded', 'true');
   }
 
   private async insertEntries(db: SQLiteDatabase, entries: Entry[]): Promise<void> {
@@ -270,10 +259,12 @@ class SqliteEntryRepository implements EntryRepository {
   }
 
   async resetToSampleData(): Promise<void> {
-    // Publish the in-flight promise as `seeded` so any concurrent `ready()`
-    // call piggybacks on the reset instead of racing a second seed.
-    this.seeded = this.rebuildSampleData();
-    await this.seeded;
+    this.resetInFlight = this.rebuildSampleData();
+    try {
+      await this.resetInFlight;
+    } finally {
+      this.resetInFlight = null;
+    }
   }
 
   private async rebuildSampleData(): Promise<void> {
@@ -282,11 +273,11 @@ class SqliteEntryRepository implements EntryRepository {
     await db.withExclusiveTransactionAsync(async (tx) => {
       await tx.runAsync('DELETE FROM photos');
       await tx.runAsync('DELETE FROM entries');
-      await tx.runAsync('DELETE FROM meta');
+      // Keep `sync_user_id`; drop the pull cursor so the samples re-push cleanly.
+      await tx.runAsync("DELETE FROM meta WHERE key IN ('seeded', 'last_pulled_at')");
     });
     const entries = await buildSeedEntries();
     await this.insertEntries(db, entries);
-    await db.runAsync('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)', 'seeded', 'true');
   }
 }
 

@@ -3,21 +3,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AuthService } from '@/data/repositories';
 import type { AuthUser } from '@/types/entry';
 
-import { MOCK_USER_ID } from './seed';
+/**
+ * Web-only stand-in for `AuthService` (see `src/data/index.web.ts`). `npm run web`
+ * is for layout checks; this accepts any email/password and persists a fake
+ * session so the login wall doesn't block iteration. Native uses the real
+ * Supabase auth service.
+ */
 
 const SESSION_KEY = 'sprig.mock.session.v1';
 
-/** The one hardcoded credential that works in the mock. */
-export const TEST_EMAIL = 'test@sprig.app';
-export const TEST_PASSWORD = 'sprig123';
-
 function makeUser(email: string): AuthUser {
+  const normalized = email.trim().toLowerCase();
   return {
-    id: MOCK_USER_ID,
-    email,
+    id: `mock-${normalized}`,
+    email: normalized,
     profile: {
-      id: MOCK_USER_ID,
-      displayName: email.split('@')[0] || 'Forager',
+      id: `mock-${normalized}`,
+      displayName: normalized.split('@')[0] || 'Forager',
       defaultMapRegion: {
         latitude: 33.6595,
         longitude: -117.9988,
@@ -46,51 +48,38 @@ class MockAuthService implements AuthService {
 
   private async setSession(user: AuthUser | null) {
     this.user = user;
-    if (user) {
-      await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(user));
-    } else {
-      await AsyncStorage.removeItem(SESSION_KEY);
-    }
+    if (user) await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(user));
+    else await AsyncStorage.removeItem(SESSION_KEY);
     this.listeners.forEach((cb) => cb(user));
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {
     await this.ensureLoaded();
-    // Dev convenience: skip the login wall while iterating on the rest of the UI.
-    // Set EXPO_PUBLIC_SPRIG_DEV_AUTOLOGIN=1 in .env.local (never committed).
-    if (!this.user && process.env.EXPO_PUBLIC_SPRIG_DEV_AUTOLOGIN === '1') {
-      this.user = makeUser(TEST_EMAIL);
-    }
     return this.user;
   }
 
-  async signInWithPassword(email: string, password: string): Promise<AuthUser> {
-    await new Promise((r) => setTimeout(r, 450));
-    const normalized = email.trim().toLowerCase();
-    if (normalized !== TEST_EMAIL || password !== TEST_PASSWORD) {
-      throw new Error('Those details did not match. Try the test login below.');
-    }
-    const user = makeUser(normalized);
+  async signUp(email: string, _password: string): Promise<AuthUser> {
+    const user = makeUser(email);
     await this.setSession(user);
     return user;
   }
 
-  async signInWithApple(): Promise<AuthUser> {
-    await new Promise((r) => setTimeout(r, 350));
-    const user = makeUser('forager@icloud.com');
-    await this.setSession(user);
-    return user;
-  }
-
-  async signInWithGoogle(): Promise<AuthUser> {
-    await new Promise((r) => setTimeout(r, 350));
-    const user = makeUser('forager@gmail.com');
+  async signIn(email: string, _password: string): Promise<AuthUser> {
+    const user = makeUser(email);
     await this.setSession(user);
     return user;
   }
 
   async signOut(): Promise<void> {
     await this.setSession(null);
+  }
+
+  async sendPasswordReset(): Promise<void> {
+    /* no-op on web */
+  }
+
+  async updatePassword(): Promise<void> {
+    /* no-op on web */
   }
 
   onAuthStateChange(cb: (user: AuthUser | null) => void): () => void {

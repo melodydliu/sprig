@@ -16,5 +16,4 @@ export const entryRepository: EntryRepository = mockEntryRepository;
 export const photoRepository: PhotoRepository = mockPhotoRepository;
 export const authService: AuthService = mockAuthService;
 
-export { TEST_EMAIL, TEST_PASSWORD } from './mock/authService';
 export * from './repositories';

@@ -113,22 +113,44 @@ Done — spec step 5c (this session):
 
 ---
 
-## Milestone 6 — real auth (spec step 6)
+## Milestone 6 — real auth — DONE (email + password)
 
-- Replace `MockAuthService` with a Supabase-backed `AuthService` (same interface;
-  one-file swap in `src/data/index.ts`). Remove the `EXPO_PUBLIC_SPRIG_DEV_AUTOLOGIN`
-  hack in `authService`.
-- Email **magic link** (deep link back into the app — `scheme: "sprig"` already
-  set), **Sign in with Apple** (`expo-apple-authentication`), **Google**
-  (`@react-native-google-signin/google-signin` or Supabase OAuth + `expo-auth-session`).
-- On sign-in, create/load the `profiles` row (`display_name`,
-  `default_map_region`).
-- **Needs the user first** (spec step 9 — ask before app-store-level credentials):
-  - Apple Developer Program membership ($99/yr) for the Sign in with Apple
-    entitlement + a real dev build.
-  - Google OAuth client IDs (iOS + web) in Google Cloud console.
-  - Supabase Auth providers configured (Apple, Google, email).
-- Until then, keep the test-credential stub as a fallback path.
+Done this session:
+
+- `src/data/supabase/authService.ts` (`supabaseAuthService`) implements a
+  reworked `AuthService`: `signUp` / `signIn` / `signOut` / `sendPasswordReset`
+  / `updatePassword` / `getCurrentUser` / `onAuthStateChange`. Loads/creates the
+  `profiles` row. `authErrors.ts` — friendly message mapping (pure, tested).
+- Bound in `src/data/index.ts`; web stays on `MockAuthService` (reworked to the
+  new interface, accepts any credentials for layout checks).
+- **Hard login wall.** `src/app/(auth)/sign-in.tsx` rebuilt: email/password with
+  a Sign in ⇄ Create account toggle, inline validation, "Forgot password?".
+  Apple/Google buttons + the test-login hint removed.
+- `src/app/reset-password.tsx` (root route, outside both guards): request-link
+  view + `sprig://reset-password` deep-link handler → set-new-password.
+- **Per-account local data.** `meta.sync_user_id`;
+  `resolveLocalForUser` (pure, in `plan.ts`) + `reconcileLocalAccount`
+  (`src/features/sync/account.ts`) — sign-in as a different user, or sign-out,
+  wipes the local SQLite cache; the next sync pass re-pulls from the cloud.
+  Wired from `authStore` on every auth-state change; `entriesStore.reset()`.
+- `src/features/sync/identity.ts` — `getSyncUserId()` now just reads the
+  session; anonymous sign-in removed.
+- **Auto-seed removed.** A real account starts with an empty journal.
+  `resetToSampleData()` (Settings ▸ Developer, `npm run reset-data`) still loads
+  the demo set. Removed `EXPO_PUBLIC_SPRIG_DEV_AUTOLOGIN`.
+- Tests: `authErrors.test.ts`, `account.test.ts` (+ existing). 59 passing.
+
+**User did:** Apple Developer Program enrolled. Supabase email provider is on.
+
+**User still needs (before this build is fully usable):**
+- Supabase ▸ Authentication ▸ Providers ▸ Email ▸ **turn OFF "Confirm email"**
+  (built-in mailer is rate-limited; custom SMTP + confirmation is a pre-public
+  item — see Phase 2).
+- Supabase ▸ Authentication ▸ URL Configuration ▸ add redirect
+  `sprig://reset-password`.
+
+Deferred: phone/SMS auth (paid SMS provider), Sign in with Apple / Google
+(post-launch), account deletion real flow (Phase 2).
 
 ---
 

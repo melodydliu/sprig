@@ -33,3 +33,14 @@ export function mergeRemote(local: Entry | undefined, remote: Entry): MergeActio
 export function storagePath(userId: string, entryId: string, photoId: string): string {
   return `${userId}/${entryId}/${photoId}.jpg`;
 }
+
+/**
+ * The local SQLite file caches one account's cloud data. Given the id it was
+ * last synced under and the id signing in now, should it be kept or wiped?
+ */
+export function resolveLocalForUser(
+  storedId: string | null,
+  currentId: string,
+): 'keep' | 'wipe' {
+  return storedId && storedId !== currentId ? 'wipe' : 'keep';
+}
