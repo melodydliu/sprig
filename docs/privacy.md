@@ -63,4 +63,4 @@ If this policy changes, the "last updated" date above changes with it.
 
 ## Contact
 
-Questions about your data: **CONTACT_EMAIL_PLACEHOLDER**
+Questions about your data: **melody@theflowerbunny.com**
