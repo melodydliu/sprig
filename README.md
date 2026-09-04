@@ -12,7 +12,7 @@ local-first data layer.
 
 ## Status
 
-**Milestone 6 — real accounts; heading to TestFlight.**
+**Live on TestFlight.** 🌿
 
 The app is a local-first foraging journal: SQLite (`sprig.db`) is the source of
 truth, and every write syncs in the background to a private Supabase project
@@ -21,8 +21,9 @@ Sign-in is **email + password** (Supabase Auth) behind a hard login wall; a new
 account starts with an empty journal, and signing in on another device restores
 it from the cloud. `npm run web` runs on the in-memory mock.
 
-Remaining before a build: pre-flight cleanup (privacy policy, `eas.json`) then
-EAS Build → TestFlight. See `TODO.md`.
+Bundle id is `com.sprigbook.app` (`com.sprig.app` was already taken). Build /
+submit / TestFlight setup steps are in `TESTFLIGHT.md`; that build expires 90
+days after submission — see `TODO.md` for the refresh command.
 
 | Milestone | What |
 | --- | --- |
@@ -34,7 +35,7 @@ EAS Build → TestFlight. See `TODO.md`.
 | 5b ✅ | Supabase schema + RLS + storage policies |
 | 5c ✅ | Photo upload + background sync queue |
 | 6 ✅ | Real auth — email + password, per-account local cache |
-| 7 | Pre-flight cleanup → EAS Build → TestFlight |
+| 7 ✅ | Pre-flight cleanup → EAS Build → **TestFlight (internal)** |
 
 ---
 

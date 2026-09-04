@@ -194,13 +194,32 @@ Prepped this session:
 - `npm run build:ios` / `submit:ios` scripts.
 - **`TESTFLIGHT.md`** — full click-by-click walkthrough.
 
-**User runs** (see `TESTFLIGHT.md`): free Expo account → `eas login` → `eas init`
-(commit the app.json change) → create the App Store Connect app record →
-`npm run build:ios` → `npm run submit:ios` → add self as internal tester →
-install via the TestFlight app.
+**Shipped.** User ran the full pipeline: free Expo account → `eas login` →
+`eas init` → App Store Connect app record (bundle id had to change — see below)
+→ `npm run build:ios` → `npm run submit:ios` → added as an internal tester →
+**installed and running on a real iPhone via TestFlight.**
+
+Gotchas hit + fixed along the way (all committed):
+- `com.sprig.app` was already taken globally (bundle ids are unique across all
+  Apple developer accounts, not just ours) → renamed to **`com.sprigbook.app`**
+  everywhere (`app.json`, `scripts/reset-data.mjs`, docs).
+- `eas.json`'s `channel` field needs `expo-updates` — `eas build` auto-installed
+  it and configured `updates.url` / `runtimeVersion` (OTA update capability for
+  later, not used yet); a permissions-list duplication side effect was cleaned up.
+- **Internal testing on a second Apple ID:** inviting someone as an App Store
+  Connect team member (even Admin) does not auto-add them to the "Team (Expo)"
+  TestFlight group — add them explicitly via TestFlight → the group → Testers →
+  **+**. On the phone, sign that Apple ID into **Settings → [name] → Media &
+  Purchases** (independent of the main iCloud Apple ID — nothing else on the
+  device is affected).
 
 Before sharing with friends: custom SMTP (Resend / SES free tier) so
-confirmation + reset emails are reliable; then a TestFlight external group.
+confirmation + reset emails are reliable; then a TestFlight **external** group
+(needs a "what to test" note + ~1 day Apple review for the first external build).
+
+Rebuild reminder: this build expires **90 days** from submission
+(`npm run build:ios && npm run submit:ios` to refresh — `autoIncrement` handles
+the build number).
 
 ---
 
