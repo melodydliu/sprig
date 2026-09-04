@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useRef, useState, type ComponentProps } from 'react';
 import { ActivityIndicator, Keyboard, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, Crosshair, Search } from 'lucide-react-native';
 
 import { Button } from '@/components/Button';
@@ -58,59 +58,65 @@ export default function LocationPickerScreen() {
   };
 
   return (
-    <View style={styles.flex}>
-      <PickerMap ref={mapRef} value={point} onChange={setPoint} />
+    // Presented as a `fullScreenModal` (see (app)/_layout.tsx) — on iOS that's a
+    // separately-presented view-controller hierarchy, so the root SafeAreaProvider
+    // doesn't propagate insets into it. Nest a fresh one so the back button below
+    // isn't measured as sitting at the very top of the screen. See capture/_layout.tsx.
+    <SafeAreaProvider>
+      <View style={styles.flex}>
+        <PickerMap ref={mapRef} value={point} onChange={setPoint} />
 
-      <SafeAreaView style={styles.overlay} edges={['top']} pointerEvents="box-none">
-        <View style={styles.searchRow}>
+        <SafeAreaView style={styles.overlay} edges={['top']} pointerEvents="box-none">
+          <View style={styles.searchRow}>
+            <Pressable
+              onPress={() => router.back()}
+              style={[styles.iconBtn, { backgroundColor: theme.colors.surface }]}
+            >
+              <ChevronLeft size={22} color={theme.colors.text} strokeWidth={2.4} />
+            </Pressable>
+
+            <View
+              style={[
+                styles.searchBox,
+                { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
+              ]}
+            >
+              <Search size={16} color={theme.colors.textMuted} />
+              <TextInputLite
+                placeholder="Search an address or place"
+                value={query}
+                onChangeText={setQuery}
+                onSubmitEditing={runSearch}
+              />
+              {searching ? <ActivityIndicator size="small" color={theme.colors.textMuted} /> : null}
+            </View>
+          </View>
+
+          {notFound ? (
+            <View style={[styles.notFound, { backgroundColor: theme.colors.surface }]}>
+              <Text variant="caption" color="textSecondary">
+                Nothing found for that. Drag the map to place the pin instead.
+              </Text>
+            </View>
+          ) : null}
+        </SafeAreaView>
+
+        <SafeAreaView style={styles.bottom} edges={['bottom']} pointerEvents="box-none">
           <Pressable
-            onPress={() => router.back()}
-            style={[styles.iconBtn, { backgroundColor: theme.colors.surface }]}
+            onPress={centerOnMe}
+            style={[styles.meBtn, theme.elevation(2), { backgroundColor: theme.colors.surface }]}
           >
-            <ChevronLeft size={22} color={theme.colors.text} strokeWidth={2.4} />
+            <Crosshair size={20} color={theme.colors.primary} strokeWidth={2.3} />
           </Pressable>
-
-          <View
-            style={[
-              styles.searchBox,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
-            ]}
-          >
-            <Search size={16} color={theme.colors.textMuted} />
-            <TextInputLite
-              placeholder="Search an address or place"
-              value={query}
-              onChangeText={setQuery}
-              onSubmitEditing={runSearch}
-            />
-            {searching ? <ActivityIndicator size="small" color={theme.colors.textMuted} /> : null}
-          </View>
-        </View>
-
-        {notFound ? (
-          <View style={[styles.notFound, { backgroundColor: theme.colors.surface }]}>
-            <Text variant="caption" color="textSecondary">
-              Nothing found for that. Drag the map to place the pin instead.
+          <View style={[styles.confirmBar, theme.elevation(2), { backgroundColor: theme.colors.surface }]}>
+            <Text variant="caption" color="textMuted" center>
+              {point.latitude.toFixed(5)}, {point.longitude.toFixed(5)}
             </Text>
+            <Button label="Use this spot" onPress={confirm} fullWidth />
           </View>
-        ) : null}
-      </SafeAreaView>
-
-      <SafeAreaView style={styles.bottom} edges={['bottom']} pointerEvents="box-none">
-        <Pressable
-          onPress={centerOnMe}
-          style={[styles.meBtn, theme.elevation(2), { backgroundColor: theme.colors.surface }]}
-        >
-          <Crosshair size={20} color={theme.colors.primary} strokeWidth={2.3} />
-        </Pressable>
-        <View style={[styles.confirmBar, theme.elevation(2), { backgroundColor: theme.colors.surface }]}>
-          <Text variant="caption" color="textMuted" center>
-            {point.latitude.toFixed(5)}, {point.longitude.toFixed(5)}
-          </Text>
-          <Button label="Use this spot" onPress={confirm} fullWidth />
-        </View>
-      </SafeAreaView>
-    </View>
+        </SafeAreaView>
+      </View>
+    </SafeAreaProvider>
   );
 }
 
