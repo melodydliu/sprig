@@ -31,7 +31,8 @@
         "android.permission.CAMERA",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.READ_MEDIA_IMAGES"
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.RECORD_AUDIO"
       ],
       "predictiveBackGestureEnabled": false
     },
@@ -78,6 +79,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "21989f4d-a3b5-4855-b795-bb2cbd528ff2"
+      }
+    },
+    "owner": "melodydliu"
   }
 }
