@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Sprig",
+    "name": "Sprigbook",
     "slug": "sprig",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,10 +12,10 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.sprigbook.app",
       "infoPlist": {
-        "NSCameraUsageDescription": "Sprig uses the camera so you can photograph a plant the moment you spot it.",
-        "NSPhotoLibraryUsageDescription": "Sprig lets you add photos from your library to a find.",
-        "NSPhotoLibraryAddUsageDescription": "Sprig can save a find's photo back to your library when you export it.",
-        "NSLocationWhenInUseUsageDescription": "Sprig tags each find with where you saw it so you can come back later. Location is saved to your private journal and its cloud backup.",
+        "NSCameraUsageDescription": "Sprigbook uses the camera so you can photograph a plant the moment you spot it.",
+        "NSPhotoLibraryUsageDescription": "Sprigbook lets you add photos from your library to a find.",
+        "NSPhotoLibraryAddUsageDescription": "Sprigbook can save a find's photo back to your library when you export it.",
+        "NSLocationWhenInUseUsageDescription": "Sprigbook tags each find with where you saw it so you can come back later. Location is saved to your private journal and its cloud backup.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -58,19 +58,19 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Sprig uses the camera so you can photograph a plant the moment you spot it."
+          "cameraPermission": "Sprigbook uses the camera so you can photograph a plant the moment you spot it."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Sprig lets you add photos from your library to a find."
+          "photosPermission": "Sprigbook lets you add photos from your library to a find."
         }
       ],
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Sprig tags each find with where you saw it so you can come back later. Location is saved to your private journal and its cloud backup."
+          "locationWhenInUsePermission": "Sprigbook tags each find with where you saw it so you can come back later. Location is saved to your private journal and its cloud backup."
         }
       ],
       "@react-native-community/datetimepicker",

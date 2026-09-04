@@ -92,7 +92,7 @@ export default function SettingsScreen() {
   const confirmDeleteAccount = () => {
     Alert.alert(
       'Delete account?',
-      'This permanently deletes every find, photo, and note in your Sprig account — on this device and in the cloud. This cannot be undone.',
+      'This permanently deletes every find, photo, and note in your Sprigbook account — on this device and in the cloud. This cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -200,7 +200,7 @@ export default function SettingsScreen() {
       ) : null}
 
       <Section title="About">
-        <Row label="App" value="Sprig" />
+        <Row label="App" value="Sprigbook" />
         <Divider />
         <Row label="Version" value={`${Constants.expoConfig?.version ?? '1.0.0'} · MVP`} />
       </Section>

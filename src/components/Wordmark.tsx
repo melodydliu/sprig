@@ -24,7 +24,7 @@ export function Wordmark({ size = 34 }: { size?: number }) {
           letterSpacing: 0.2,
         }}
       >
-        Sprig
+        Sprigbook
       </Text>
     </View>
   );

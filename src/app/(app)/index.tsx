@@ -62,7 +62,7 @@ export default function JournalScreen() {
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <Sprig size={24} />
-          <Text variant="display">Journal</Text>
+          <Text variant="display">Sprigbook</Text>
         </View>
         <View style={styles.headerRight}>
           <Toggle viewMode={viewMode} onChange={setViewMode} />

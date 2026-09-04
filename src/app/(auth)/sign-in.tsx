@@ -119,7 +119,7 @@ export default function SignInScreen() {
           accessibilityRole="button"
         >
           <Text variant="caption" color="textMuted" center>
-            {mode === 'signin' ? 'New to Sprig?' : 'Already have an account?'}
+            {mode === 'signin' ? 'New to Sprigbook?' : 'Already have an account?'}
           </Text>
           <Text variant="label" color="primary" center>
             {mode === 'signin' ? 'Create an account' : 'Sign in instead'}
