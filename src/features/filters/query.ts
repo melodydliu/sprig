@@ -22,7 +22,6 @@ export function isFilterActive(f: EntryFilter): boolean {
     f.categories.length > 0 ||
     f.colors.length > 0 ||
     f.tags.length > 0 ||
-    f.favoritesOnly ||
     f.dateFrom != null ||
     f.dateTo != null ||
     f.withinMiles != null
@@ -34,7 +33,6 @@ export function countActiveFilters(f: EntryFilter): number {
   n += f.categories.length;
   n += f.colors.length;
   n += f.tags.length;
-  if (f.favoritesOnly) n += 1;
   if (f.dateFrom != null || f.dateTo != null) n += 1;
   if (f.withinMiles != null) n += 1;
   return n;

@@ -24,7 +24,7 @@ export function SearchBar() {
       <TextInput
         value={search}
         onChangeText={setSearch}
-        placeholder="Search finds, notes, places, tags"
+        placeholder="Search"
         placeholderTextColor={theme.colors.textMuted}
         autoCapitalize="none"
         autoCorrect={false}

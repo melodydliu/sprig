@@ -180,8 +180,11 @@ describe('filter helpers', () => {
   it('isFilterActive / countActiveFilters', () => {
     expect(isFilterActive(EMPTY_FILTER)).toBe(false);
     expect(countActiveFilters(EMPTY_FILTER)).toBe(0);
-    const f = filter({ categories: ['flower', 'foliage'], favoritesOnly: true, dateFrom: '2026-01-01' });
+    const f = filter({ categories: ['flower', 'foliage'], dateFrom: '2026-01-01' });
     expect(isFilterActive(f)).toBe(true);
-    expect(countActiveFilters(f)).toBe(4);
+    expect(countActiveFilters(f)).toBe(3);
+    // favoritesOnly is driven by its own control, not the filter sheet.
+    expect(isFilterActive(filter({ favoritesOnly: true }))).toBe(false);
+    expect(countActiveFilters(filter({ favoritesOnly: true }))).toBe(0);
   });
 });

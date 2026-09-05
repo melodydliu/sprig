@@ -4,7 +4,7 @@ import { Link, useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowUpDown, List, Map as MapIcon, Plus, Settings, SlidersHorizontal } from 'lucide-react-native';
+import { ArrowUpDown, Heart, List, Map as MapIcon, Plus, Settings, SlidersHorizontal } from 'lucide-react-native';
 
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
@@ -31,7 +31,7 @@ export default function JournalScreen() {
   const insets = useSafeAreaInsets();
 
   const { all, loading, refreshing, loaded, load } = useEntries();
-  const { search, filter, sort, viewMode, setViewMode } = useFilters();
+  const { search, filter, sort, viewMode, setViewMode, toggleFavoritesOnly } = useFilters();
   const { point: origin } = useCurrentLocation();
   const units = useSettings((s) => s.units);
   const appliedRevision = useSync((s) => s.appliedRevision);
@@ -76,6 +76,13 @@ export default function JournalScreen() {
 
       <View style={styles.controls}>
         <SearchBar />
+        <IconBtn
+          icon={Heart}
+          active={filter.favoritesOnly}
+          activeColor={theme.colors.favorite}
+          accessibilityLabel={filter.favoritesOnly ? 'Show all entries' : 'Show favorites only'}
+          onPress={toggleFavoritesOnly}
+        />
         <IconBtn
           icon={SlidersHorizontal}
           badge={activeFilters}
@@ -196,25 +203,40 @@ function IconBtn({
   icon: Icon,
   onPress,
   badge,
+  active = false,
+  activeColor,
+  accessibilityLabel,
 }: {
   icon: typeof List;
   onPress: () => void;
   badge?: number;
+  active?: boolean;
+  activeColor?: string;
+  accessibilityLabel?: string;
 }) {
   const theme = useTheme();
+  const tint = active ? (activeColor ?? theme.colors.accent) : theme.colors.textSecondary;
   return (
     <Pressable
       onPress={onPress}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
       style={[
         styles.iconBtn,
         {
-          backgroundColor: theme.colors.surface,
-          borderColor: theme.colors.border,
+          backgroundColor: active ? theme.colors.primarySoft : theme.colors.surface,
+          borderColor: active ? tint : theme.colors.border,
           borderRadius: theme.radius.md,
         },
       ]}
     >
-      <Icon size={19} color={theme.colors.textSecondary} strokeWidth={2.3} />
+      <Icon
+        size={19}
+        color={tint}
+        fill={active ? tint : 'transparent'}
+        strokeWidth={2.3}
+      />
       {badge ? (
         <View style={[styles.badge, { backgroundColor: theme.colors.accent }]}>
           <Text variant="caption" style={{ color: '#fff', fontSize: 10 }}>

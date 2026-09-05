@@ -50,7 +50,6 @@ export const FilterSheet = forwardRef<BottomSheetModal>(function FilterSheet(_pr
     toggleCategory,
     toggleColor,
     toggleTag,
-    toggleFavoritesOnly,
     setDateRange,
     setWithinMiles,
     clearFilter,
@@ -143,18 +142,6 @@ export const FilterSheet = forwardRef<BottomSheetModal>(function FilterSheet(_pr
             <TagFilterField allTags={availableTags} selected={filter.tags} onToggle={toggleTag} />
           </Section>
         ) : null}
-
-        <Section title="Favorites">
-          <View style={styles.wrap}>
-            <Chip
-              Touchable={TouchableOpacity}
-              label="Favorites only"
-              accent={theme.colors.favorite}
-              selected={filter.favoritesOnly}
-              onPress={toggleFavoritesOnly}
-            />
-          </View>
-        </Section>
 
         <Section title="Date captured">
           <View style={styles.wrap}>

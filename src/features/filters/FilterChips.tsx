@@ -14,7 +14,6 @@ export function FilterChips() {
     toggleCategory,
     toggleColor,
     toggleTag,
-    toggleFavoritesOnly,
     setDateRange,
     setWithinMiles,
   } = useFilters();
@@ -35,9 +34,6 @@ export function FilterChips() {
   }
   for (const t of filter.tags) {
     chips.push({ key: `tag-${t}`, label: `#${t}`, onRemove: () => toggleTag(t) });
-  }
-  if (filter.favoritesOnly) {
-    chips.push({ key: 'fav', label: 'Favorites', onRemove: toggleFavoritesOnly });
   }
   if (filter.dateFrom) {
     chips.push({ key: 'date', label: 'Date range', onRemove: () => setDateRange(null, null) });
