@@ -8,10 +8,8 @@ import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
 import { useToast } from '@/components/Toast';
 import { useAuth } from '@/features/auth/authStore';
-import { exportAllData } from '@/features/data-export/exportData';
 import { useEntries } from '@/features/entries/entriesStore';
 import { useSettings, type Units } from '@/features/settings/settingsStore';
-import { syncEngine, useSync } from '@/features/sync';
 import { useTheme } from '@/theme/ThemeProvider';
 
 export default function SettingsScreen() {
@@ -22,49 +20,14 @@ export default function SettingsScreen() {
   const user = useAuth((s) => s.user);
   const signOut = useAuth((s) => s.signOut);
   const deleteAccount = useAuth((s) => s.deleteAccount);
-  const { all, resetToSampleData } = useEntries();
+  const { resetToSampleData } = useEntries();
   const { units, setUnits, hydrate } = useSettings();
-  const sync = useSync();
 
-  const [busy, setBusy] = useState<null | 'reset' | 'export' | 'sync' | 'delete'>(null);
+  const [busy, setBusy] = useState<null | 'reset' | 'delete'>(null);
 
   useEffect(() => {
     void hydrate();
   }, [hydrate]);
-
-  const entryCount = all.filter((e) => !e.deletedAt).length;
-
-  const syncStatusLabel =
-    sync.status === 'disabled'
-      ? 'Off — no Supabase keys'
-      : sync.status === 'syncing'
-        ? 'Syncing…'
-        : sync.status === 'error'
-          ? (sync.error ?? 'Last sync had errors')
-          : sync.pending > 0
-            ? `${sync.pending} waiting to sync`
-            : 'All backed up';
-
-  const doSync = async () => {
-    setBusy('sync');
-    try {
-      await syncEngine.syncNow();
-      await useEntries.getState().load({ force: true });
-      toast.show(useSync.getState().status === 'error' ? 'Sync incomplete' : 'Synced', 'success');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const doExport = async () => {
-    setBusy('export');
-    try {
-      const res = await exportAllData();
-      if (res.ok) toast.show(`Exported ${res.count} finds`, 'success');
-    } finally {
-      setBusy(null);
-    }
-  };
 
   const confirmReset = () => {
     Alert.alert(
@@ -124,47 +87,32 @@ export default function SettingsScreen() {
       </View>
 
       <Section title="Account">
-        <Row label="Signed in as" value={user?.email ?? '—'} />
-        <Divider />
-        <Row label="Name" value={user?.profile.displayName ?? '—'} />
+        <Row label="Email" value={user?.email ?? '—'} />
         <Divider />
         <TapRow label="Sign out" tone="danger" onPress={signOut} />
       </Section>
 
-      <Section title="Sync">
-        <Row label="Status" value={syncStatusLabel} />
-        <Divider />
-        <TapRow
-          label={busy === 'sync' || sync.status === 'syncing' ? 'Syncing…' : 'Sync now'}
-          onPress={doSync}
-          disabled={busy != null || sync.status === 'disabled'}
-        />
-        <Text variant="caption" color="textMuted" style={styles.note}>
-          {sync.status === 'disabled'
-            ? 'Add EXPO_PUBLIC_SUPABASE_* keys to .env.local to back finds up to the cloud.'
-            : 'Finds sync to your Supabase project in the background. Your device stays the source of truth.'}
-        </Text>
-      </Section>
-
-      <Section title="Units">
-        <View style={styles.segmentRow}>
+      <Section title="Units" bare>
+        <View style={styles.unitRow}>
           {(['mi', 'km'] as Units[]).map((u) => {
             const active = units === u;
             return (
               <Pressable
                 key={u}
                 onPress={() => setUnits(u)}
-                style={[
-                  styles.segment,
+                style={({ pressed }) => [
+                  styles.unitBtn,
                   {
-                    backgroundColor: active ? theme.colors.primary : theme.colors.surface,
+                    backgroundColor: active ? theme.colors.primary : 'transparent',
                     borderColor: active ? theme.colors.primary : theme.colors.border,
+                    borderRadius: theme.radius.md,
+                    opacity: pressed ? 0.85 : 1,
                   },
                 ]}
               >
                 <Text
                   variant="label"
-                  style={{ color: active ? theme.colors.onPrimary : theme.colors.textSecondary }}
+                  style={{ color: active ? theme.colors.onPrimary : theme.colors.text }}
                 >
                   {u === 'mi' ? 'Miles' : 'Kilometres'}
                 </Text>
@@ -172,21 +120,6 @@ export default function SettingsScreen() {
             );
           })}
         </View>
-      </Section>
-
-      <Section title="Data">
-        <TapRow
-          label={busy === 'export' ? 'Preparing…' : `Export all data (${entryCount} finds)`}
-          onPress={doExport}
-          disabled={busy != null}
-        />
-        <Divider />
-        <TapRow
-          label={busy === 'delete' ? 'Deleting…' : 'Delete account'}
-          tone="danger"
-          onPress={confirmDeleteAccount}
-          disabled={busy != null}
-        />
       </Section>
 
       {__DEV__ ? (
@@ -205,30 +138,54 @@ export default function SettingsScreen() {
         <Row label="Version" value={`${Constants.expoConfig?.version ?? '1.0.0'} · MVP`} />
       </Section>
 
+      <Pressable
+        onPress={confirmDeleteAccount}
+        disabled={busy != null}
+        hitSlop={8}
+        style={styles.deleteRow}
+      >
+        <Text variant="caption" color="danger" style={{ opacity: busy != null ? 0.4 : 0.75 }}>
+          {busy === 'delete' ? 'Deleting…' : 'Delete account'}
+        </Text>
+      </Pressable>
+
       <View style={{ height: 40 }} />
     </Screen>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+  bare = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  /** Skip the surface card wrapper and render children directly on the screen. */
+  bare?: boolean;
+}) {
   const theme = useTheme();
   return (
     <View style={styles.section}>
       <Text variant="label" color="textMuted" style={styles.sectionTitle}>
         {title.toUpperCase()}
       </Text>
-      <View
-        style={[
-          styles.card,
-          {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.border,
-            borderRadius: theme.radius.lg,
-          },
-        ]}
-      >
-        {children}
-      </View>
+      {bare ? (
+        children
+      ) : (
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              borderRadius: theme.radius.lg,
+            },
+          ]}
+        >
+          {children}
+        </View>
+      )}
     </View>
   );
 }
@@ -297,13 +254,18 @@ const styles = StyleSheet.create({
   },
   rowValue: { flexShrink: 1, textAlign: 'right' },
   divider: { height: StyleSheet.hairlineWidth, marginLeft: 16 },
-  note: { paddingHorizontal: 4, marginTop: 8 },
-  segmentRow: { flexDirection: 'row', gap: 8 },
-  segment: {
+  unitRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  unitBtn: {
     flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 13,
     borderWidth: 1.5,
   },
+  deleteRow: { alignItems: 'center', paddingVertical: 14, marginTop: 12 },
 });

@@ -21,7 +21,6 @@ import { useCurrentLocation } from '@/features/location/useCurrentLocation';
 import { JournalMap } from '@/features/map/JournalMap';
 import { useSettings } from '@/features/settings/settingsStore';
 import { syncEngine } from '@/features/sync';
-import { SyncStatusBar } from '@/features/sync/components/SyncStatusBar';
 import { useSync } from '@/features/sync/syncStore';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -92,8 +91,6 @@ export default function JournalScreen() {
       </View>
 
       <FilterChips />
-
-      <SyncStatusBar />
 
       {viewMode === 'map' ? (
         <JournalMap entries={visible} />

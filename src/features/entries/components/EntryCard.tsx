@@ -2,9 +2,10 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { memo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Star } from 'lucide-react-native';
+import { Heart } from 'lucide-react-native';
 
 import { Text } from '@/components/Text';
+import { useEntries } from '@/features/entries/entriesStore';
 import { relativeDate } from '@/lib/format';
 import { formatDistance } from '@/lib/geo';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -22,6 +23,7 @@ interface Props {
 function EntryCardImpl({ entry, origin, unit = 'mi' }: Props) {
   const theme = useTheme();
   const router = useRouter();
+  const toggleFavorite = useEntries((s) => s.toggleFavorite);
   const cover = entry.photos[0];
   const distance =
     origin && entry.location ? formatDistance(origin, entry.location, unit) : null;
@@ -50,16 +52,24 @@ function EntryCardImpl({ entry, origin, unit = 'mi' }: Props) {
             transition={140}
           />
         ) : null}
-        {entry.isFavorite ? (
-          <View style={[styles.fav, { backgroundColor: theme.colors.surface }]}>
-            <Star
-              size={13}
-              color={theme.colors.favorite}
-              fill={theme.colors.favorite}
-              strokeWidth={2}
-            />
-          </View>
-        ) : null}
+        <Pressable
+          onPress={() => toggleFavorite(entry.id)}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel={entry.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          accessibilityState={{ selected: entry.isFavorite }}
+          style={({ pressed }) => [
+            styles.fav,
+            { backgroundColor: theme.colors.surface, opacity: pressed ? 0.7 : 1 },
+          ]}
+        >
+          <Heart
+            size={15}
+            color={theme.colors.favorite}
+            fill={entry.isFavorite ? theme.colors.favorite : 'transparent'}
+            strokeWidth={2.2}
+          />
+        </Pressable>
       </View>
 
       <View style={styles.body}>
@@ -114,10 +124,10 @@ const styles = StyleSheet.create({
   fav: {
     position: 'absolute',
     top: 8,
-    left: 8,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    right: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },

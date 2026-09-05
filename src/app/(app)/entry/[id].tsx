@@ -13,10 +13,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ChevronLeft,
+  Heart,
   Navigation,
   Pencil,
   Share2,
-  Star,
   Trash2,
 } from 'lucide-react-native';
 
@@ -102,7 +102,7 @@ export default function EntryDetailScreen() {
             <CircleButton icon={ChevronLeft} onPress={() => router.back()} />
             <View style={styles.overlayRight}>
               <CircleButton
-                icon={Star}
+                icon={Heart}
                 fill={entry.isFavorite}
                 onPress={() => toggleFavorite(entry.id)}
               />
@@ -193,12 +193,12 @@ function CircleButton({
   onPress,
   fill,
 }: {
-  icon: typeof Star;
+  icon: typeof Heart;
   onPress: () => void;
   fill?: boolean;
 }) {
   const theme = useTheme();
-  const isStar = Icon === Star;
+  const isFav = Icon === Heart;
   return (
     <Pressable
       onPress={onPress}
@@ -209,8 +209,8 @@ function CircleButton({
     >
       <Icon
         size={20}
-        color={isStar ? theme.colors.favorite : theme.colors.text}
-        fill={isStar && fill ? theme.colors.favorite : 'transparent'}
+        color={isFav ? theme.colors.favorite : theme.colors.text}
+        fill={isFav && fill ? theme.colors.favorite : 'transparent'}
         strokeWidth={2.3}
       />
     </Pressable>
