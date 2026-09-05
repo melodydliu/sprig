@@ -84,7 +84,9 @@
       "router": {},
       "eas": {
         "projectId": "21989f4d-a3b5-4855-b795-bb2cbd528ff2"
-      }
+      },
+      "supabaseUrl": "https://nrncwojvqbqmyumfsxkm.supabase.co",
+      "supabaseAnonKey": "sb_publishable_esoUzQbPfISGS8I0lgBgNQ_lqaBAtX2"
     },
     "owner": "melodydliu",
     "runtimeVersion": {
