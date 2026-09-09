@@ -74,11 +74,20 @@ create table if not exists public.entries (
 );
 
 -- Migrating existing deployments: `category` (single) -> `categories` (array).
--- Safe to re-run — each statement is a no-op once already applied.
+-- Guarded so the whole block is a no-op once `category` has already been dropped
+-- (a bare `update ... set categories = array[category]` fails to plan without it).
 alter table public.entries add column if not exists categories text[] not null default '{}';
-update public.entries set categories = array[category]
-  where category is not null and categories = '{}';
-alter table public.entries drop column if exists category;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'entries' and column_name = 'category'
+  ) then
+    update public.entries set categories = array[category]
+      where category is not null and categories = '{}';
+    alter table public.entries drop column category;
+  end if;
+end $$;
 
 -- Optional forage-availability self-assessment ('sparse' | 'moderate' | 'abundant').
 alter table public.entries add column if not exists availability text;
