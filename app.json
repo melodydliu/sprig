@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.sprigbook.app",
       "infoPlist": {
         "NSCameraUsageDescription": "Sprigbook uses the camera so you can photograph a plant the moment you spot it.",
