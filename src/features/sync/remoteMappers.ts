@@ -19,6 +19,7 @@ export interface RemoteEntryRow {
   name: string | null;
   categories: string[];
   colors: string[];
+  availability: string | null;
   notes: string;
   location_lat: number | null;
   location_lng: number | null;
@@ -52,6 +53,7 @@ export function entryToRemote(entry: Entry, userId: string): RemoteEntryRow {
     name: entry.name,
     categories: entry.categories ?? [],
     colors: entry.colors ?? [],
+    availability: entry.availability ?? null,
     notes: entry.notes ?? '',
     location_lat: entry.location?.latitude ?? null,
     location_lng: entry.location?.longitude ?? null,
@@ -110,6 +112,7 @@ export function remoteToEntry(row: RemoteEntryRow & { photos?: RemotePhotoRow[] 
     name: row.name,
     categories: (row.categories ?? []) as Entry['categories'],
     colors: (row.colors ?? []) as Entry['colors'],
+    availability: (row.availability as Entry['availability']) ?? null,
     notes: row.notes ?? '',
     photos: (row.photos ?? [])
       .slice()

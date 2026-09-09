@@ -1,6 +1,6 @@
 import { uid } from '@/lib/id';
 import { copyBundledPhoto } from '@/lib/images';
-import type { Category, ColorName, Entry, LocationSource, Photo } from '@/types/entry';
+import type { Availability, Category, ColorName, Entry, LocationSource, Photo } from '@/types/entry';
 
 import { SEED_IMAGE_H, SEED_IMAGE_W, seedImages, type SeedImageKey } from './mock/seedImages';
 
@@ -18,6 +18,7 @@ interface SeedSpec {
   name: string | null;
   categories: Category[];
   colors: ColorName[];
+  availability?: Availability;
   notes: string;
   images: SeedImageKey[];
   label: string;
@@ -35,6 +36,7 @@ const SPECS: SeedSpec[] = [
     name: 'Wild fennel',
     categories: ['foliage'],
     colors: ['green', 'yellow'],
+    availability: 'abundant',
     notes:
       'Huge stand of it along the bike path, taller than me. Smells like licorice when you brush past. The flower umbels are just starting to open — come back in ~2 weeks for the acid-yellow pollen heads, they are unreal in arrangements and last about a week in water. Watch for the dog-walkers in the morning, easier to cut midday.',
     images: ['foliage-1', 'foliage-3'],
@@ -49,6 +51,7 @@ const SPECS: SeedSpec[] = [
     name: 'Nasturtium',
     categories: ['flower'],
     colors: ['orange', 'red', 'yellow'],
+    availability: 'abundant',
     notes:
       'Spilling over a retaining wall on the corner. Neighbor said take as much as I want. Jewel tones, edible, but they wilt fast — cut early and condition in cold water.',
     images: ['flower-1'],
@@ -88,6 +91,7 @@ const SPECS: SeedSpec[] = [
     name: 'Matilija poppy',
     categories: ['flower'],
     colors: ['white', 'yellow'],
+    availability: 'sparse',
     notes:
       'The "fried egg" poppy. Enormous crepe-paper white petals, yellow center. Only a few open at a time so plan around it. Sap bleeds — sear the stems.',
     images: ['flower-2'],
@@ -114,6 +118,7 @@ const SPECS: SeedSpec[] = [
     name: 'Eucalyptus (silver dollar)',
     categories: ['foliage'],
     colors: ['green', 'blue'],
+    availability: 'moderate',
     notes:
       'Long low branch hanging over the sidewalk, easy reach. Round juvenile leaves, very silvery. Someone already trims this so I do not feel bad taking a few stems.',
     images: ['foliage-2'],
@@ -152,6 +157,7 @@ const SPECS: SeedSpec[] = [
     name: 'Jacaranda',
     categories: ['branch_stem'],
     colors: ['purple', 'blue'],
+    availability: 'sparse',
     notes:
       'Street trees dropping blossoms everywhere. Can only get low branches or fallen ones but the color is worth it for one big statement piece. Very messy in the car.',
     images: ['branch-2'],
@@ -190,6 +196,7 @@ const SPECS: SeedSpec[] = [
     name: 'California buckwheat',
     categories: ['seed_pod_dried'],
     colors: ['brown', 'pink', 'cream'],
+    availability: 'abundant',
     notes: 'Flower heads have gone rusty-pink and papery. Holds shape beautifully dried. Whole hillside of it.',
     images: ['pod-2'],
     label: 'Heisler Park bluff, Laguna Beach',
@@ -289,6 +296,7 @@ const SPECS: SeedSpec[] = [
     name: 'Wild mustard',
     categories: ['flower'],
     colors: ['yellow', 'green'],
+    availability: 'abundant',
     notes: 'The whole vacant field turns yellow with it. Leggy and a bit weedy up close but a big loose armful in a bucket looks like spring itself.',
     images: ['flower-3'],
     label: 'Vacant field, Edwards St',
@@ -348,6 +356,7 @@ export async function buildSeedEntries(now: number = Date.now()): Promise<Entry[
       name: spec.name,
       categories: spec.categories,
       colors: spec.colors,
+      availability: spec.availability ?? null,
       notes: spec.notes,
       photos,
       location: spec.noLocation ? null : { latitude: spec.lat, longitude: spec.lng },

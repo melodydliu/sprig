@@ -9,6 +9,7 @@ function entry(over: Partial<Entry>): Entry {
     name: 'Wild fennel',
     categories: ['foliage'],
     colors: ['green', 'yellow'],
+    availability: 'abundant',
     notes: 'bike path',
     photos: [],
     location: { latitude: 33.69, longitude: -118.04 },

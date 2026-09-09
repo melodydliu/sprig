@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import type { EntryFilter, SortKey } from '@/data/repositories';
-import type { Category, ColorName } from '@/types/entry';
+import type { Availability, Category, ColorName } from '@/types/entry';
 
 import { EMPTY_FILTER } from './query';
 
@@ -18,6 +18,7 @@ interface FilterState {
   setViewMode: (m: ViewMode) => void;
   toggleCategory: (c: Category) => void;
   toggleColor: (c: ColorName) => void;
+  toggleAvailability: (a: Availability) => void;
   toggleTag: (t: string) => void;
   toggleFavoritesOnly: () => void;
   setDateRange: (from: string | null, to: string | null) => void;
@@ -53,6 +54,16 @@ export const useFilters = create<FilterState>((set) => ({
         colors: state.filter.colors.includes(c)
           ? state.filter.colors.filter((x) => x !== c)
           : [...state.filter.colors, c],
+      },
+    })),
+
+  toggleAvailability: (a) =>
+    set((state) => ({
+      filter: {
+        ...state.filter,
+        availability: state.filter.availability.includes(a)
+          ? state.filter.availability.filter((x) => x !== a)
+          : [...state.filter.availability, a],
       },
     })),
 

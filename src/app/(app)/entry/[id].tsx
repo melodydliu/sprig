@@ -30,6 +30,7 @@ import { useEntries } from '@/features/entries/entriesStore';
 import { openDirections } from '@/lib/directions';
 import { fullDate } from '@/lib/format';
 import { useTheme } from '@/theme/ThemeProvider';
+import { AVAILABILITY_HINTS, AVAILABILITY_LABELS } from '@/types/entry';
 
 export default function EntryDetailScreen() {
   const theme = useTheme();
@@ -127,6 +128,24 @@ export default function EntryDetailScreen() {
           <Text variant="caption" color="textMuted">
             Captured {fullDate(entry.sightedAt)}
           </Text>
+
+          {entry.availability ? (
+            <View style={styles.availabilityRow}>
+              <View
+                style={[
+                  styles.availabilityPill,
+                  { backgroundColor: theme.colors.primarySoft, borderRadius: theme.radius.pill },
+                ]}
+              >
+                <Text variant="label" style={{ color: theme.colors.onPrimarySoft }}>
+                  {AVAILABILITY_LABELS[entry.availability]}
+                </Text>
+              </View>
+              <Text variant="caption" color="textMuted" style={styles.availabilityHint}>
+                {AVAILABILITY_HINTS[entry.availability]}
+              </Text>
+            </View>
+          ) : null}
 
           {entry.notes ? (
             <Text variant="body" color="textSecondary" style={styles.notes}>
@@ -270,6 +289,9 @@ const styles = StyleSheet.create({
   circle: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
   body: { padding: 20, gap: 10 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 2 },
+  availabilityRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6, flexWrap: 'wrap' },
+  availabilityPill: { paddingHorizontal: 11, paddingVertical: 5 },
+  availabilityHint: { flexShrink: 1 },
   notes: { marginTop: 6, lineHeight: 23 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
   tag: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },

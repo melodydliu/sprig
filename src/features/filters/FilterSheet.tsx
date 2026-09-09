@@ -16,7 +16,14 @@ import { useFilters } from '@/features/filters/filterStore';
 import { countActiveFilters } from '@/features/filters/query';
 import { TagFilterField } from '@/features/filters/TagFilterField';
 import { useTheme } from '@/theme/ThemeProvider';
-import { CATEGORIES, CATEGORY_LABELS, COLOR_NAMES, type ColorName } from '@/types/entry';
+import {
+  AVAILABILITY_LABELS,
+  AVAILABILITY_LEVELS,
+  CATEGORIES,
+  CATEGORY_LABELS,
+  COLOR_NAMES,
+  type ColorName,
+} from '@/types/entry';
 
 const COLOR_LABELS: Record<ColorName, string> = {
   white: 'White',
@@ -49,6 +56,7 @@ export const FilterSheet = forwardRef<BottomSheetModal>(function FilterSheet(_pr
     filter,
     toggleCategory,
     toggleColor,
+    toggleAvailability,
     toggleTag,
     setDateRange,
     setWithinMiles,
@@ -132,6 +140,20 @@ export const FilterSheet = forwardRef<BottomSheetModal>(function FilterSheet(_pr
                 swatch={theme.swatch(c)}
                 selected={filter.colors.includes(c)}
                 onPress={() => toggleColor(c)}
+              />
+            ))}
+          </View>
+        </Section>
+
+        <Section title="Availability">
+          <View style={styles.wrap}>
+            {AVAILABILITY_LEVELS.map((level) => (
+              <Chip
+                key={level}
+                Touchable={TouchableOpacity}
+                label={AVAILABILITY_LABELS[level]}
+                selected={filter.availability.includes(level)}
+                onPress={() => toggleAvailability(level)}
               />
             ))}
           </View>
