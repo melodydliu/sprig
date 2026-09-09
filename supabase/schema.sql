@@ -59,6 +59,7 @@ create table if not exists public.entries (
   name            text,
   categories      text[] not null default '{}',
   colors          text[] not null default '{}',
+  availability    text,
   notes           text not null default '',
   location_lat    double precision,
   location_lng    double precision,
@@ -78,6 +79,9 @@ alter table public.entries add column if not exists categories text[] not null d
 update public.entries set categories = array[category]
   where category is not null and categories = '{}';
 alter table public.entries drop column if exists category;
+
+-- Optional forage-availability self-assessment ('sparse' | 'moderate' | 'abundant').
+alter table public.entries add column if not exists availability text;
 
 create index if not exists entries_user_id_idx      on public.entries (user_id);
 create index if not exists entries_user_updated_idx on public.entries (user_id, updated_at);

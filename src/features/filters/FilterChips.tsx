@@ -5,7 +5,7 @@ import { Text } from '@/components/Text';
 import { useFilters } from '@/features/filters/filterStore';
 import { isFilterActive } from '@/features/filters/query';
 import { useTheme } from '@/theme/ThemeProvider';
-import { CATEGORY_LABELS } from '@/types/entry';
+import { AVAILABILITY_LABELS, CATEGORY_LABELS } from '@/types/entry';
 
 export function FilterChips() {
   const theme = useTheme();
@@ -13,6 +13,7 @@ export function FilterChips() {
     filter,
     toggleCategory,
     toggleColor,
+    toggleAvailability,
     toggleTag,
     setDateRange,
     setWithinMiles,
@@ -30,6 +31,13 @@ export function FilterChips() {
       key: `col-${c}`,
       label: c[0].toUpperCase() + c.slice(1),
       onRemove: () => toggleColor(c),
+    });
+  }
+  for (const a of filter.availability) {
+    chips.push({
+      key: `avail-${a}`,
+      label: AVAILABILITY_LABELS[a],
+      onRemove: () => toggleAvailability(a),
     });
   }
   for (const t of filter.tags) {

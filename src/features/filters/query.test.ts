@@ -21,6 +21,7 @@ function makeEntry(over: Partial<Entry> = {}): Entry {
     name: 'Wild fennel',
     categories: ['foliage'],
     colors: ['green', 'yellow'],
+    availability: null,
     notes: 'along the bike path',
     photos: [],
     location: HB,
@@ -77,6 +78,16 @@ describe('matchesFilter', () => {
     const e = makeEntry({ colors: ['green', 'yellow'] });
     expect(matchesFilter(e, filter({ colors: ['red', 'yellow'] }))).toBe(true);
     expect(matchesFilter(e, filter({ colors: ['red', 'blue'] }))).toBe(false);
+  });
+
+  it('filters by availability (any of the selected levels)', () => {
+    const abundant = makeEntry({ availability: 'abundant' });
+    expect(matchesFilter(abundant, filter({ availability: ['abundant'] }))).toBe(true);
+    expect(matchesFilter(abundant, filter({ availability: ['sparse', 'moderate'] }))).toBe(false);
+    // An entry with no availability recorded is excluded once the filter is on.
+    expect(matchesFilter(makeEntry({ availability: null }), filter({ availability: ['sparse'] }))).toBe(
+      false,
+    );
   });
 
   it('filters by tag (any overlap)', () => {

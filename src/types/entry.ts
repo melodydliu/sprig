@@ -19,6 +19,26 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   other: 'Other',
 };
 
+/**
+ * Roughly how much of the plant is there to forage — a single optional
+ * self-assessment, not a measurement. `null` means the forager didn't record it.
+ */
+export const AVAILABILITY_LEVELS = ['sparse', 'moderate', 'abundant'] as const;
+export type Availability = (typeof AVAILABILITY_LEVELS)[number];
+
+export const AVAILABILITY_LABELS: Record<Availability, string> = {
+  sparse: 'Sparse',
+  moderate: 'Moderate',
+  abundant: 'Abundant',
+};
+
+/** One-liners shown under the picker / on the detail screen. */
+export const AVAILABILITY_HINTS: Record<Availability, string> = {
+  sparse: 'Only a few stems — take little or nothing',
+  moderate: 'Enough to pick a small amount',
+  abundant: 'Plenty here for cutting',
+};
+
 export const COLOR_NAMES = [
   'white',
   'cream',
@@ -67,6 +87,8 @@ export interface Entry {
   /** At least one category; the first is treated as primary for map pins etc. */
   categories: Category[];
   colors: ColorName[];
+  /** How much there is to forage; `null` if not recorded. */
+  availability: Availability | null;
   notes: string;
   photos: Photo[];
   location: GeoPoint | null;
@@ -86,6 +108,7 @@ export interface EntryDraft {
   name: string | null;
   categories: Category[];
   colors: ColorName[];
+  availability: Availability | null;
   notes: string;
   location: GeoPoint | null;
   locationSource: LocationSource | null;

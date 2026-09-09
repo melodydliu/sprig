@@ -6,13 +6,23 @@
  * Swapping implementations must not touch any screen or component.
  */
 
-import type { AuthUser, Category, ColorName, Entry, EntryDraft, GeoPoint } from '@/types/entry';
+import type {
+  AuthUser,
+  Availability,
+  Category,
+  ColorName,
+  Entry,
+  EntryDraft,
+  GeoPoint,
+} from '@/types/entry';
 
 export type SortKey = 'newest' | 'oldest' | 'nearest' | 'name' | 'recently_updated';
 
 export interface EntryFilter {
   categories: Category[];
   colors: ColorName[];
+  /** Match any of these availability levels (empty = no availability filter). */
+  availability: Availability[];
   tags: string[];
   favoritesOnly: boolean;
   /** ISO date (inclusive lower bound) for `sightedAt`. */

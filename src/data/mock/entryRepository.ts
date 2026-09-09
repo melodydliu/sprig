@@ -81,6 +81,7 @@ class MockEntryRepository implements EntryRepository {
       name: draft.name?.trim() ? draft.name.trim() : null,
       categories: draft.categories,
       colors: draft.colors,
+      availability: draft.availability ?? null,
       notes: draft.notes,
       photos,
       location: draft.location,
@@ -104,6 +105,7 @@ class MockEntryRepository implements EntryRepository {
     if (patch.name !== undefined) entry.name = patch.name?.trim() ? patch.name.trim() : null;
     if (patch.categories !== undefined) entry.categories = patch.categories;
     if (patch.colors !== undefined) entry.colors = patch.colors;
+    if (patch.availability !== undefined) entry.availability = patch.availability;
     if (patch.notes !== undefined) entry.notes = patch.notes;
     if (patch.location !== undefined) entry.location = patch.location;
     if (patch.locationSource !== undefined) entry.locationSource = patch.locationSource;

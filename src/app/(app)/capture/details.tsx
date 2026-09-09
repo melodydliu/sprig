@@ -170,6 +170,7 @@ export default function CaptureDetailsScreen() {
               name: draft.name,
               categories: draft.categories,
               colors: draft.colors,
+              availability: draft.availability,
               notes: draft.notes,
               tags: draft.tags,
               location: draft.location,

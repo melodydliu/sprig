@@ -64,6 +64,12 @@ export const MIGRATIONS: Migration[] = [
       `ALTER TABLE entries DROP COLUMN category`,
     ],
   },
+  {
+    // Optional forage-availability self-assessment: 'sparse' | 'moderate' |
+    // 'abundant', NULL when not recorded.
+    version: 3,
+    statements: [`ALTER TABLE entries ADD COLUMN availability TEXT`],
+  },
 ];
 
 export const LATEST_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;

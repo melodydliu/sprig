@@ -1,6 +1,6 @@
 import type { SQLiteBindValue } from 'expo-sqlite';
 
-import type { ColorName, Entry, Photo } from '@/types/entry';
+import type { Availability, ColorName, Entry, Photo } from '@/types/entry';
 
 /**
  * Pure row <-> domain mapping. No SQLite calls here so it can be unit-tested
@@ -14,6 +14,7 @@ export interface EntryRow {
   name: string | null;
   categories: string;
   colors: string;
+  availability: string | null;
   notes: string;
   location_lat: number | null;
   location_lng: number | null;
@@ -73,6 +74,7 @@ export function rowToEntry(row: EntryRow, photoRows: PhotoRow[]): Entry {
     name: row.name,
     categories: parseStringArray(row.categories) as Entry['categories'],
     colors: parseStringArray(row.colors) as ColorName[],
+    availability: (row.availability as Availability | null) ?? null,
     notes: row.notes,
     photos: photoRows
       .slice()
@@ -100,6 +102,7 @@ export function entryToRow(entry: Entry): EntryRow {
     name: entry.name,
     categories: JSON.stringify(entry.categories ?? []),
     colors: JSON.stringify(entry.colors ?? []),
+    availability: entry.availability ?? null,
     notes: entry.notes ?? '',
     location_lat: entry.location?.latitude ?? null,
     location_lng: entry.location?.longitude ?? null,
@@ -136,6 +139,7 @@ export const ENTRY_COLUMNS: (keyof EntryRow)[] = [
   'name',
   'categories',
   'colors',
+  'availability',
   'notes',
   'location_lat',
   'location_lng',

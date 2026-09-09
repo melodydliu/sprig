@@ -12,6 +12,7 @@ function entry(over: Partial<Entry>): Entry {
     name: null,
     categories: ['flower'],
     colors: [],
+    availability: null,
     notes: '',
     photos: [],
     location: null,

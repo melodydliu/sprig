@@ -10,6 +10,7 @@ import type { Entry, GeoPoint } from '@/types/entry';
 export const EMPTY_FILTER: EntryFilter = {
   categories: [],
   colors: [],
+  availability: [],
   tags: [],
   favoritesOnly: false,
   dateFrom: null,
@@ -21,6 +22,7 @@ export function isFilterActive(f: EntryFilter): boolean {
   return (
     f.categories.length > 0 ||
     f.colors.length > 0 ||
+    f.availability.length > 0 ||
     f.tags.length > 0 ||
     f.dateFrom != null ||
     f.dateTo != null ||
@@ -32,6 +34,7 @@ export function countActiveFilters(f: EntryFilter): number {
   let n = 0;
   n += f.categories.length;
   n += f.colors.length;
+  n += f.availability.length;
   n += f.tags.length;
   if (f.dateFrom != null || f.dateTo != null) n += 1;
   if (f.withinMiles != null) n += 1;
@@ -67,6 +70,12 @@ export function matchesFilter(
     return false;
   }
   if (filter.colors.length > 0 && !filter.colors.some((c) => entry.colors.includes(c))) {
+    return false;
+  }
+  if (
+    filter.availability.length > 0 &&
+    (entry.availability == null || !filter.availability.includes(entry.availability))
+  ) {
     return false;
   }
   if (filter.tags.length > 0 && !filter.tags.some((t) => entry.tags.includes(t))) {

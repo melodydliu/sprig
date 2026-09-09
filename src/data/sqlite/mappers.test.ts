@@ -16,6 +16,7 @@ const baseEntryRow: EntryRow = {
   name: 'Wild fennel',
   categories: '["foliage"]',
   colors: '["green","yellow"]',
+  availability: 'abundant',
   notes: 'Along the bike path.',
   location_lat: 33.693,
   location_lng: -118.047,
@@ -76,6 +77,7 @@ describe('rowToEntry', () => {
     expect(entry.id).toBe('en_1');
     expect(entry.categories).toEqual(['foliage']);
     expect(entry.colors).toEqual(['green', 'yellow']);
+    expect(entry.availability).toBe('abundant');
     expect(entry.tags).toEqual(['roadside', 'summer']);
     expect(entry.isFavorite).toBe(true);
     expect(entry.location).toEqual({ latitude: 33.693, longitude: -118.047 });
@@ -111,6 +113,7 @@ describe('round trips', () => {
       name: null,
       categories: ['flower', 'seed_pod_dried'],
       colors: ['purple'],
+      availability: 'moderate',
       notes: '',
       photos: [],
       location: null,

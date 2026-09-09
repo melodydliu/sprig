@@ -122,6 +122,7 @@ class SqliteEntryRepository implements EntryRepository {
       name: draft.name?.trim() ? draft.name.trim() : null,
       categories: draft.categories,
       colors: draft.colors,
+      availability: draft.availability ?? null,
       notes: draft.notes,
       photos,
       location: draft.location,
@@ -151,6 +152,7 @@ class SqliteEntryRepository implements EntryRepository {
     if (patch.name !== undefined) set('name', patch.name?.trim() ? patch.name.trim() : null);
     if (patch.categories !== undefined) set('categories', JSON.stringify(patch.categories));
     if (patch.colors !== undefined) set('colors', JSON.stringify(patch.colors));
+    if (patch.availability !== undefined) set('availability', patch.availability ?? null);
     if (patch.notes !== undefined) set('notes', patch.notes);
     if (patch.location !== undefined) {
       set('location_lat', patch.location?.latitude ?? null);

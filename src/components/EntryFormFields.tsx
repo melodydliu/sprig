@@ -1,5 +1,6 @@
 import { View, StyleSheet } from 'react-native';
 
+import { AvailabilityPicker } from '@/components/AvailabilityPicker';
 import { CategoryPicker } from '@/components/CategoryPicker';
 import { ColorPicker } from '@/components/ColorPicker';
 import { DateField } from '@/components/DateField';
@@ -7,12 +8,13 @@ import { Field } from '@/components/Field';
 import { LocationField } from '@/components/LocationField';
 import { TagInput } from '@/components/TagInput';
 import { Text } from '@/components/Text';
-import type { Category, ColorName, GeoPoint, LocationSource } from '@/types/entry';
+import type { Availability, Category, ColorName, GeoPoint, LocationSource } from '@/types/entry';
 
 export interface EntryFormValues {
   name: string | null;
   categories: Category[];
   colors: ColorName[];
+  availability: Availability | null;
   notes: string;
   tags: string[];
   location: GeoPoint | null;
@@ -73,6 +75,13 @@ export function EntryFormFields({
                 : [...values.colors, c],
             })
           }
+        />
+      </Group>
+
+      <Group label="AVAILABILITY">
+        <AvailabilityPicker
+          value={values.availability}
+          onChange={(availability) => onChange({ availability })}
         />
       </Group>
 
