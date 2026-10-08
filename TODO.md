@@ -160,9 +160,9 @@ Done this session:
 - **Delete account** (`settings.tsx` + `authService.deleteAccount`): real
   destructive flow — removes Storage objects then `photos` / `entries` /
   `profiles` rows for the uid, then signs out (wipes local). Two-step confirm.
-  NOTE: the `auth.users` row itself still needs a service-role Edge Function to
-  delete — required before the **public** App Store, fine for TestFlight (the
-  login can be reused to start fresh).
+  Now calls the `delete-account` Edge Function (`supabase/functions/`), which also
+  deletes the `auth.users` row. **Must be deployed before the public release** —
+  see `supabase/README.md`.
 - **Developer section** in Settings gated behind `__DEV__` — no "Reset to sample
   data" in a release build.
 - `docs/privacy.md` + `docs/README.md` (how to publish via GitHub Pages).
@@ -220,6 +220,34 @@ confirmation + reset emails are reliable; then a TestFlight **external** group
 Rebuild reminder: this build expires **90 days** from submission
 (`npm run build:ios && npm run submit:ios` to refresh — `autoIncrement` handles
 the build number).
+
+---
+
+## Post-1.0 — plant/flower ID ("Suggest name")
+
+Not in 1.0 on purpose: sending photos to a third party changes the App Privacy
+label + App Review notes, so do it as a follow-up release.
+
+- **Provider:** Pl@ntNet API (free tier, roughly 500 IDs/day — re-check current
+  limits, key requirement and attribution/commercial terms before building).
+  Fallbacks: iNaturalist CV API (not openly available to third parties; needs an
+  access request), Plant.id / Kindwise (paid after trial). On-device TFLite
+  rejected: native module (full build per change) + large model.
+- **UX:** "Suggest name" button on the capture/edit form. Uploads the primary
+  photo, shows the top ~3 guesses with confidence; tapping one fills the name
+  field. Results are suggestions only — user always confirms.
+- **Architecture:** new `PlantIdService` interface in `src/data/repositories.ts`,
+  bound in `src/data/index.ts` (UI never imports the provider directly). Feature
+  folder `src/features/plantId/`; pure result-ranking/mapping unit-tested.
+- **Do not ship the API key in the app bundle.** Proxy through a Supabase Edge
+  Function (holds the key, requires an authed user, rate-limits per user) so the
+  quota can't be drained by extracting the key.
+- **Safety copy:** label as "suggestion", show confidence, and add "Never eat
+  anything based on an app ID" near the result. Foraging misIDs can be dangerous.
+- **Before release:** update the App Privacy label (photos shared with a
+  third-party processor), `docs/privacy.md`, and the review notes in
+  `APP_STORE.md`. JS-only change, so it can ship via
+  `eas update --platform ios` once those are done.
 
 ---
 

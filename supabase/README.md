@@ -79,3 +79,16 @@ only ever read or write the signed-in user's own rows. Never commit the
 | --- | --- |
 | `schema.sql` | `profiles`, `entries`, `photos` tables (+ indexes, sign-up trigger) |
 | `policies.sql` | RLS on all three (own-rows-only) + private `entry-photos` bucket & storage policies |
+
+## Edge Functions
+
+`functions/delete-account` — permanently deletes the signed-in user (Storage
+photos, then `auth.users`; Postgres rows cascade). Required for in-app account
+deletion (App Store guideline 5.1.1(v)). Deploy with:
+
+```
+supabase functions deploy delete-account --project-ref <ref>
+```
+
+Leave "Verify JWT" on (the default). `SUPABASE_*` env vars are injected by the
+runtime — no secrets to set.
