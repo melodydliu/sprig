@@ -48,7 +48,7 @@ demo credentials** (Guideline 2.1). Do this before submitting:
 
 1. In the app (TestFlight build) or via Supabase, create an account with throwaway
    credentials you're willing to put in App Store Connect, e.g.
-   `applereview@theflowerbunny.com` / a strong password.
+   `sprigreview@theflowerbunny.com` / a strong password.
 2. Signed in as that account, add **3–4 finds** with photos, notes, a location, and
    different availability levels, so the reviewer sees populated list / map / detail
    screens.

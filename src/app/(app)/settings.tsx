@@ -89,6 +89,8 @@ export default function SettingsScreen() {
       <Section title="Account">
         <Row label="Email" value={user?.email ?? '—'} />
         <Divider />
+        <TapRow label="Change password" onPress={() => router.push('/change-password')} />
+        <Divider />
         <TapRow label="Sign out" tone="danger" onPress={signOut} />
       </Section>
 
