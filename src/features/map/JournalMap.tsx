@@ -2,7 +2,7 @@ import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from '@gorhom/
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import MapView, { Marker, PROVIDER_DEFAULT, type Region } from 'react-native-maps';
 import { Crosshair } from 'lucide-react-native';
 
@@ -49,6 +49,14 @@ export function JournalMap({ entries }: { entries: Entry[] }) {
 
   const [region, setRegion] = useState<Region>(initialRegion);
   const [selected, setSelected] = useState<Entry | null>(null);
+  // Don't mount MapKit until the container has a real size. Mounting it while the
+  // parent is still 0×0 (e.g. right after switching from the list) can leave the
+  // map unable to pan/zoom/tap until the app is reloaded.
+  const [laidOut, setLaidOut] = useState(false);
+  const onLayout = (e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    if (width > 0 && height > 0) setLaidOut(true);
+  };
   const { clusters, index } = useClusters(entries, region);
 
   const renderBackdrop = useCallback(
@@ -77,46 +85,48 @@ export function JournalMap({ entries }: { entries: Entry[] }) {
   };
 
   return (
-    <View style={styles.flex}>
-      <MapView
-        ref={mapRef}
-        provider={PROVIDER_DEFAULT}
-        style={StyleSheet.absoluteFill}
-        initialRegion={initialRegion}
-        onRegionChangeComplete={setRegion}
-        showsUserLocation
-        showsMyLocationButton={false}
-        toolbarEnabled={false}
-      >
-        {clusters.map((c) =>
-          c.count > 1 ? (
-            <Marker
-              key={c.id}
-              coordinate={{ latitude: c.latitude, longitude: c.longitude }}
-              onPress={() => onClusterPress(c.clusterId!, c.latitude, c.longitude)}
-              tracksViewChanges={false}
-            >
-              <View style={[styles.cluster, { backgroundColor: theme.colors.primary }]}>
-                <Text variant="label" style={{ color: theme.colors.onPrimary }}>
-                  {c.count}
-                </Text>
-              </View>
-            </Marker>
-          ) : (
-            <Marker
-              key={c.id}
-              coordinate={{ latitude: c.latitude, longitude: c.longitude }}
-              onPress={() => {
-                setSelected(c.entry ?? null);
-                sheetRef.current?.present();
-              }}
-              tracksViewChanges={false}
-            >
-              <Pin category={c.entry?.categories[0] ?? 'other'} />
-            </Marker>
-          ),
-        )}
-      </MapView>
+    <View style={styles.flex} onLayout={onLayout}>
+      {laidOut ? (
+        <MapView
+          ref={mapRef}
+          provider={PROVIDER_DEFAULT}
+          style={StyleSheet.absoluteFill}
+          initialRegion={initialRegion}
+          onRegionChangeComplete={setRegion}
+          showsUserLocation
+          showsMyLocationButton={false}
+          toolbarEnabled={false}
+        >
+          {clusters.map((c) =>
+            c.count > 1 ? (
+              <Marker
+                key={c.id}
+                coordinate={{ latitude: c.latitude, longitude: c.longitude }}
+                onPress={() => onClusterPress(c.clusterId!, c.latitude, c.longitude)}
+                tracksViewChanges={false}
+              >
+                <View style={[styles.cluster, { backgroundColor: theme.colors.primary }]}>
+                  <Text variant="label" style={{ color: theme.colors.onPrimary }}>
+                    {c.count}
+                  </Text>
+                </View>
+              </Marker>
+            ) : (
+              <Marker
+                key={c.id}
+                coordinate={{ latitude: c.latitude, longitude: c.longitude }}
+                onPress={() => {
+                  setSelected(c.entry ?? null);
+                  sheetRef.current?.present();
+                }}
+                tracksViewChanges={false}
+              >
+                <Pin category={c.entry?.categories[0] ?? 'other'} />
+              </Marker>
+            ),
+          )}
+        </MapView>
+      ) : null}
 
       <View style={styles.controls} pointerEvents="box-none">
         <Pressable
@@ -223,7 +233,7 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     marginTop: -1,
   },
-  controls: { position: 'absolute', right: 18, bottom: 96 },
+  controls: { position: 'absolute', right: 18, top: 16 },
   meBtn: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
   preview: { paddingHorizontal: 20, paddingTop: 4, paddingBottom: 28, gap: 14 },
   previewRow: { flexDirection: 'row', gap: 12 },

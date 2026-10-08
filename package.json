@@ -77,7 +77,8 @@
     "test": "jest",
     "gen-app-icon": "node ./scripts/generate-app-icon.mjs",
     "build:ios": "eas build --platform ios --profile production",
-    "submit:ios": "eas submit --platform ios --latest"
+    "submit:ios": "eas submit --platform ios --latest",
+    "ship": "eas build --platform ios --profile production --auto-submit --no-wait"
   },
   "jest": {
     "preset": "jest-expo",
