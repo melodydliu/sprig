@@ -6,14 +6,16 @@ import { Button } from '@/components/Button';
 import { Field } from '@/components/Field';
 import { Screen } from '@/components/Screen';
 import { Text } from '@/components/Text';
-import { Wordmark } from '@/components/Wordmark';
+import { Sprig } from '@/components/Wordmark';
 import { useAuth } from '@/features/auth/authStore';
+import { useTheme } from '@/theme/ThemeProvider';
 
 type Mode = 'signin' | 'signup';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SignInScreen() {
+  const theme = useTheme();
   const { submitting, error, signIn, signUp, clearError } = useAuth();
   const [mode, setMode] = useState<Mode>('signin');
   const [email, setEmail] = useState('');
@@ -51,9 +53,20 @@ export default function SignInScreen() {
         style={styles.flex}
       >
         <View style={styles.header}>
-          <Wordmark size={40} />
+          <Sprig size={112} />
+          <Text
+            style={{
+              fontFamily: theme.typography.display.fontFamily,
+              fontSize: 38,
+              lineHeight: 44,
+              color: theme.colors.text,
+              letterSpacing: 0.2,
+            }}
+          >
+            Sprigbook
+          </Text>
           <Text variant="serifItalic" color="textSecondary" style={styles.tagline}>
-            A quiet place to remember what&apos;s growing where.
+            A personal foraging journal to remember what&apos;s growing where.
           </Text>
         </View>
 
@@ -133,7 +146,7 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { justifyContent: 'space-between', paddingVertical: 24, gap: 32 },
-  header: { alignItems: 'center', gap: 14, marginTop: 24 },
+  header: { alignItems: 'center', gap: 12, marginTop: 24 },
   tagline: { textAlign: 'center', maxWidth: 280 },
   form: { gap: 14 },
   error: { marginLeft: 2 },
