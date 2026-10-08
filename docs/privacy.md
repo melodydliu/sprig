@@ -1,6 +1,6 @@
 # Sprigbook — Privacy Policy
 
-_Last updated: 9 September 2026_
+_Last updated: 8 October 2026_
 
 Sprigbook is a personal foraging journal. This policy explains what the app
 stores, where it goes, and the choices you have. It is written to be read, not to
@@ -38,6 +38,9 @@ find — the app never tracks your location in the background.
 
 - **Supabase** hosts the database, authentication, and photo storage for the
   cloud backup. Their [privacy policy](https://supabase.com/privacy).
+- **Resend** delivers the account emails (such as password-reset links) on
+  Sprigbook's behalf, so it handles your email address when one is sent. Their
+  [privacy policy](https://resend.com/legal/privacy-policy).
 - **Apple** distributes the app through TestFlight and the App Store and may
   collect its own diagnostics per your device settings.
 
@@ -49,7 +52,8 @@ Your data is never sold, and it is not shared with anyone else.
   on the next sync, from the cloud (a deletion marker is kept briefly so other
   devices you use also remove it).
 - **Everything:** Settings → Delete account permanently removes all of your
-  finds, photos, notes, and profile from your device and from the cloud.
+  finds, photos, notes, and profile from your device and from the cloud, and
+  deletes your sign-in account itself (including your email address).
 
 ## Children
 
