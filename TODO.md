@@ -9,6 +9,48 @@ each milestone with a clear message (see existing history for style; keep the
 
 ---
 
+## Current status — 2026-10-08 (read this first)
+
+**Sprigbook v1.0.0 is submitted for App Review** — iOS build #9 (commit `0f78395`,
+EAS build `0d8c000b-b9e7-40e3-a66c-2e13019ccc00`). Release is set to **manual**:
+click *Release this version* in App Store Connect once it shows Pending Developer
+Release. Review usually takes 24–48 h. Runbook + listing copy: `APP_STORE.md`.
+
+**Freeze until Apple responds — do not touch:**
+- Demo account `sprigreview@theflowerbunny.com` (4 finds, 6 photos): no password
+  change, deletion or data edits. The reviewer signs in with it.
+- No new production builds/submissions, no Supabase changes (incl. the
+  `delete-account` Edge Function), keep Resend/SMTP and the three GitHub Pages
+  URLs (`/`, `/privacy`, `/support`) up.
+
+**Shipped in the 1.0 batch (all merged):** real account deletion via the
+`delete-account` Edge Function (removes the `auth.users` row + Storage photos);
+"Back to sign in" fix on the reset screens; larger stacked logo + new tagline on
+sign-in; map first-load guard (mounts MapKit only after layout) and the locate
+button moved top-right; Settings → Change password; `npm run ship`
+(build + auto-submit, `--no-wait`); custom SMTP via Resend (done in the dashboard);
+privacy policy updated for Resend + full deletion.
+
+**If Apple rejects:** read the Resolution Center message. Metadata-only fixes need
+no build. Code fixes: batch, verify on simulator/phone, then one `npm run ship`.
+
+**After approval — backlog**
+- Click **Release**; then confirm the live listing (screenshots, description, URLs).
+- Confirm on the live/TestFlight build: the map no longer freezes intermittently
+  (the guard in `JournalMap.tsx` was a reasoned fix, **not reproduced or confirmed**;
+  next step if it recurs: detect the dead state and remount the map).
+- Plant/flower ID "Suggest name" (see the Post-1.0 section below).
+- Change email in Settings (Supabase sends confirmation emails — needs care).
+- Description wording: `APP_STORE.md` says "Optional cloud backup" but sync is
+  automatic when signed in; consider "Automatic cloud backup…" in a metadata update.
+- Housekeeping in `APP_STORE.md`: stale "Part 3, step 8" reference (credentials are
+  §3.6) and unchecked pre-flight boxes; screenshots are 1206×2622 opaque JPEGs
+  (App Store Connect's iPhone slot rejected 1320×2868 PNGs).
+- Open UI/UX questions at the bottom of this file.
+- Android stays deferred until "ready to ship".
+
+---
+
 ## Status
 
 Done — spec steps 2–4 (Milestones 1–4 in commit history):
@@ -213,8 +255,7 @@ Gotchas hit + fixed along the way (all committed):
   Purchases** (independent of the main iCloud Apple ID — nothing else on the
   device is affected).
 
-Before sharing with friends: custom SMTP (Resend / SES free tier) so
-confirmation + reset emails are reliable; then a TestFlight **external** group
+Before sharing with friends: ~~custom SMTP~~ (**done 2026-10-08**, Resend); then a TestFlight **external** group
 (needs a "what to test" note + ~1 day Apple review for the first external build).
 
 Rebuild reminder: this build expires **90 days** from submission
