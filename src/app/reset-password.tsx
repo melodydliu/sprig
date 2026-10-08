@@ -31,6 +31,7 @@ export default function ResetPasswordScreen() {
   const toast = useToast();
   const url = Linking.useURL();
   const { submitting, error, sendPasswordReset, updatePassword, clearError } = useAuth();
+  const signedIn = useAuth((s) => s.status === 'authed');
 
   const [phase, setPhase] = useState<Phase>('request');
   const [email, setEmail] = useState('');
@@ -78,6 +79,10 @@ export default function ResetPasswordScreen() {
       router.replace('/');
     }
   };
+
+  // Signed out, `/` is the protected (app) home and the replace is a no-op — go to
+  // the sign-in screen explicitly. Signed in (recovery session), `/` is the journal.
+  const backToStart = () => router.replace(signedIn ? '/' : '/sign-in');
 
   return (
     <Screen scroll contentStyle={styles.content}>
@@ -167,7 +172,7 @@ export default function ResetPasswordScreen() {
           ) : null}
         </View>
 
-        <Pressable onPress={() => router.replace('/')} style={styles.link} accessibilityRole="button">
+        <Pressable onPress={backToStart} style={styles.link} accessibilityRole="button">
           <Text variant="label" color="primary" center>
             Back to sign in
           </Text>
