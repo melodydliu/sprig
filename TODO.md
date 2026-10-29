@@ -9,19 +9,23 @@ each milestone with a clear message (see existing history for style; keep the
 
 ---
 
-## Current status — 2026-10-08 (read this first)
+## Current status — 2026-10-28 (read this first)
 
-**Sprigbook v1.0.0 is submitted for App Review** — iOS build #9 (commit `0f78395`,
-EAS build `0d8c000b-b9e7-40e3-a66c-2e13019ccc00`). Release is set to **manual**:
-click *Release this version* in App Store Connect once it shows Pending Developer
-Release. Review usually takes 24–48 h. Runbook + listing copy: `APP_STORE.md`.
+**Sprigbook v1.0.0 is live on the App Store** — approved and released 2026-10-28:
+<https://apps.apple.com/app/id6808697566>. iOS build #9 (commit `0f78395`,
+EAS build `0d8c000b-b9e7-40e3-a66c-2e13019ccc00`). Runbook + listing copy: `APP_STORE.md`.
 
-**Freeze until Apple responds — do not touch:**
-- Demo account `sprigreview@theflowerbunny.com` (4 finds, 6 photos): no password
-  change, deletion or data edits. The reviewer signs in with it.
-- No new production builds/submissions, no Supabase changes (incl. the
-  `delete-account` Edge Function), keep Resend/SMTP and the three GitHub Pages
-  URLs (`/`, `/privacy`, `/support`) up.
+**Now that it's public:**
+- `eas update --channel production --platform ios` reaches **every App Store user**
+  on 1.0.0 (`runtimeVersion` policy = `appVersion`). Test on simulator / `preview` first.
+- Next binary: bump `version` in `app.json` to `1.0.1` (build number auto-increments)
+  and submit as a new App Store version. Description edits ride along with it; only
+  Promotional Text can change without a new version.
+- Keep the demo account `sprigreview@theflowerbunny.com` working — Apple reviews
+  every future version with it. Keep Resend/SMTP, the `delete-account` Edge Function
+  and the GitHub Pages URLs (`/`, `/privacy`, `/support`) up.
+- Done 2026-10-28: test + anonymous accounts removed from Supabase Auth; anonymous
+  sign-ins disabled.
 
 **Shipped in the 1.0 batch (all merged):** real account deletion via the
 `delete-account` Edge Function (removes the `auth.users` row + Storage photos);
@@ -35,14 +39,15 @@ privacy policy updated for Resend + full deletion.
 no build. Code fixes: batch, verify on simulator/phone, then one `npm run ship`.
 
 **After approval — backlog**
-- Click **Release**; then confirm the live listing (screenshots, description, URLs).
+- Confirm the live listing (screenshots, description, URLs) and smoke-test the
+  App Store build (sign up, add find + photos, sync, password reset, delete account).
 - Confirm on the live/TestFlight build: the map no longer freezes intermittently
   (the guard in `JournalMap.tsx` was a reasoned fix, **not reproduced or confirmed**;
   next step if it recurs: detect the dead state and remount the map).
 - Plant/flower ID "Suggest name" (see the Post-1.0 section below).
 - Change email in Settings (Supabase sends confirmation emails — needs care).
 - Description wording: `APP_STORE.md` says "Optional cloud backup" but sync is
-  automatic when signed in; consider "Automatic cloud backup…" in a metadata update.
+  automatic when signed in; change to "Automatic cloud backup…" with the 1.0.1 submission.
 - Housekeeping in `APP_STORE.md`: stale "Part 3, step 8" reference (credentials are
   §3.6) and unchecked pre-flight boxes; screenshots are 1206×2622 opaque JPEGs
   (App Store Connect's iPhone slot rejected 1320×2868 PNGs).
